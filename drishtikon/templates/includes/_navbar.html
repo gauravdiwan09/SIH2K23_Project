@@ -12,16 +12,16 @@
     </button>  
    <div class="collapse navbar-collapse" id="navbarSupportedContent">
      <ul class="nav navbar-nav ml-auto">
-      {% if session.logged_in %}
-      {% if session.user_role == "student" %}
+      {% if request.session.logged_in %}
+      {% if request.session.user_role == "student" %}
       <li class="nav-item ">
-        <a class="nav-link" id="active1" href="/student_index"><span class="fas fa-columns" > Dashboard</span></a></li>
+        <a class="nav-link" id="active1" href="/studentindex/"><span class="fas fa-columns" > Dashboard</span></a></li>
       </li>
       <li class="nav-item">
         <a class="nav-link" id="active2" href="/changepassword_student"><span class="fas fa-key" > Change Password</span></a></li>
       </li>
       {% endif %}
-      {% if session.user_role == "teacher" %}
+      {% if request.session.user_role == "teacher" %}
       <li class="nav-item ">
         <a class="nav-link" id="active1" href="/professor_index"><span class="fas fa-columns" > Dashboard</span></a></li>
       </li>
@@ -36,10 +36,10 @@
             <a class="nav-link" id="active4" href="/faq"><span class="fas fa-question" > FAQ</span></a></li>
 
           <li class="nav-item">
-            <a class="nav-link" id="active4" href ="#" onclick="return funLogout()" class="btn btn-secondary text-dark btn-xs"><span class="fas fa-sign-out-alt" > Logout</span></a></li>
+            <a class="nav-link" id="active4" href ="/logout/" onclick="return funLogout()" class="btn btn-secondary text-dark btn-xs"><span class="fas fa-sign-out-alt" > Logout</span></a></li>
     {% else %}
     <li class="nav-item">
-      <a class="nav-link" id="active6"  href="/login/"><span class="fas fa-sign-in-alt" > Login</span></a></li>
+      <a class="nav-link" id="active6"  href="/loginpage/"><span class="fas fa-sign-in-alt" > Login</span></a></li>
     </li>
       <li class="nav-item">
         <a class="nav-link" id="active5" href="/registerpage/"><span class="fas fa-user-plus" > Register</span></a></li>
