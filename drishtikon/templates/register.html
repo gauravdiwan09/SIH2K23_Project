@@ -11,7 +11,7 @@
                             </div>
 							<img src="{% static 'personal_information.png' %}">
                             <div class="card-body">
-							    <form action="" method="POST" class="mt-4">
+							    <form action="/register/" method="POST" class="mt-4">
                     {% csrf_token %}
                                     <div class="form-group">
                                       <label for="email">EMAIL</label>

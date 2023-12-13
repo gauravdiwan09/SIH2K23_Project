@@ -16,7 +16,6 @@ def contact_us_email(message,email):
 
 def otp_email(subject,message,email):
     try:
-        subject="Donot Reply"
         email_from=settings.EMAIL_HOST_USER
         recipient_list=[email,]
         send_mail(subject,message,email_from,recipient_list)
