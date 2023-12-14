@@ -17,4 +17,7 @@ urlpatterns = [
     path("professorindex/", views.professor_index, name="ProfessorIndexPage"),
     path("createtestpage/", views.create_test_page, name="CreateTestPage"),
     path("createtest/", views.create_test, name="CreateTest"),
+    path("givetestpage/", views.give_test_page, name="GiveTestPage"),
+    path("givetest/", views.give_test, name="GiveTest"),
+    path("test/<str:testid>/", views.test, name="Test"),
     ]

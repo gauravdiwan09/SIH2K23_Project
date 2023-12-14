@@ -1,6 +1,5 @@
 {% extends 'student_dashboard.html' %}
 {% block body %}
-{% from "includes/_formhelpers.html" import render_field %}
 <div class="row align-items-center d-flex  justify-content-center">
   <div class="col-12 mb-4">
       <div class="card border-light shadow-sm components-section align-items-center d-flex  justify-content-center">
@@ -10,29 +9,60 @@
                       <h3 class="h3 text-center">EXAM LOGIN</h3>  
                     </div>
                     <div class="card-body">
-							        <form action="" method="POST" class="mt-4">
-                                    <div class="form-group">
-                                      {{render_field(form.test_id, class="form-control")}}
-                                    </div>
-                                    <div class="form-group">
-                                      {{render_field(form.password, class="form-control")}}
-                                    </div>
-
-                                    <div class="form-group">
-                                      <video id="stream" width="370" height="320">
-                                          <canvas id="capture" width="370" height="320">
-                                          </canvas>
-                                        </video>
-                                        <br>
+							        <!-- <form action="/givetest/" method="POST" class="mt-4" enctype="multipart/form-data">
+                        {% csrf_token %}
+                                  <label for="test_id">Exam Id:</label>
+                                  <input type="text" id="test_id" name="test_id">
+                                  <label for="password">Exam Password: </label>
+                                  <input type="password" id="password" name="password">
+                                  <div class="form-group">
+                                    <video id="stream" width="370" height="320">
+                                        <canvas id="capture" width="370" height="320">
+                                        </canvas>
+                                      </video>
                                         <button id="btn-capture" type="button" class="btn btn-primary justify-content-center">Capture Image</button>
-                                        <br><br>
-                                          <div id="snapshot"></div>
-                                          {{render_field(form.img_hidden_form, id="img_hidden")}}
-                                      </div>
-
+                                    <br><br>
+                                        <div id="snapshot"></div>
+                                    <input type="hidden" id="image_hidden" name="image_hidden">
+                                    </div>
                                     <input type="submit" class="btn btn-block btn-primary" value="Login For Exam"/>
                                   </div>
-                                  </form>
+                                  </form> -->
+                                  <form action="/givetest/" method="POST" class="mt-4">
+                                    {% csrf_token %}
+                                      <div class="form-group">
+                                          <label for="test_id">Exam Id:</label>
+                                          <div class="input-group mb-4">
+                                              <div class="input-group-prepend">
+                                                  <span class="input-group-text"><span class="fas fa-envelope"></span></span>
+                                              </div>
+                        <input name="test_id" class="form-control"  type="text" required>
+                                          </div>
+                                      </div>
+      
+                                      <div class="form-group">
+                                          <div class="form-group">
+                                              <label for="password">Password</label>
+                                              <div class="input-group mb-4">
+                                                  <div class="input-group-prepend">
+                                                      <span class="input-group-text"><span class="fas fa-unlock-alt"></span></span>
+                                                  </div>
+                        <input name="password" type="text" class="form-control" placeholder="Password" style="-webkit-text-security:disc;" aria-label="Password" required>                                        </div>
+                                      </div>
+                                      </div>
+                                          
+                                          <div class="form-group">
+                                              <video id="stream" width="370" height="320">
+                                                  <canvas id="capture" width="370" height="320">
+                                                  </canvas>
+                                                </video>
+                                                  <button id="btn-capture" type="button" class="btn btn-primary justify-content-center">Capture Image</button>
+                                              <br><br>
+                                                  <div id="snapshot"></div>
+                                              <input type="hidden" id="image_hidden" name="image_hidden">
+                                              </div>
+                                  <button type="submit" class="btn btn-block btn-primary">Start Test</button>
+                              </form>                                 
                             </div>
                         </div>
                     </div>
@@ -40,73 +70,136 @@
             </div>
         
 <script>
-var btnCapture = document.getElementById( "btn-capture" );
+// var btnCapture = document.getElementById( "btn-capture" );
 
-var stream = document.getElementById( "stream" );
-var capture = document.getElementById( "capture" );
-var snapshot = document.getElementById( "snapshot" );
+// var stream = document.getElementById( "stream" );
+// var capture = document.getElementById( "capture" );
+// var snapshot = document.getElementById( "snapshot" );
 
-var cameraStream = null;
+// var cameraStream = null;
 
-btnCapture.addEventListener( "click", captureSnapshot );
+// btnCapture.addEventListener( "click", captureSnapshot );
 
-function startStreaming() {
+// function startStreaming() {
 
-  var mediaSupport = 'mediaDevices' in navigator;
+//   var mediaSupport = 'mediaDevices' in navigator;
 
-  if( mediaSupport && null == cameraStream ) {
+//   if( mediaSupport && null == cameraStream ) {
 
-    navigator.mediaDevices.getUserMedia( { video: true } )
-    .then( function( mediaStream ) {
+//     navigator.mediaDevices.getUserMedia( { video: true } )
+//     .then( function( mediaStream ) {
 
-      cameraStream = mediaStream;
+//       cameraStream = mediaStream;
 
-      stream.srcObject = mediaStream;
+//       stream.srcObject = mediaStream;
 
-      stream.play();
-    })
-    .catch( function( err ) {
+//       stream.play();
+//     })
+//     .catch( function( err ) {
 
-      console.log( "Unable to access camera: " + err );
-    });
-  }
-  else {
+//       console.log( "Unable to access camera: " + err );
+//     });
+//   }
+//   else {
 
-    alert( 'Your browser does not support media devices.' );
+//     alert( 'Your browser does not support media devices.' );
 
-    return;
-  }
-}
+//     return;
+//   }
+// }
 
-function captureSnapshot() {
+// function captureSnapshot() {
 
-  if( null != cameraStream ) {
+//   if( null != cameraStream ) {
 
-    var ctx = capture.getContext( '2d' );
-    var img = new Image();
+//     var ctx = capture.getContext( '2d' );
+//     var img = new Image();
 
-    ctx.drawImage( stream, 0, 0, capture.width, capture.height );
+//     ctx.drawImage( stream, 0, 0, capture.width, capture.height );
   
-    img.src		= capture.toDataURL( "image/png" );
-    img.width	= 370;
-    img.height	= 320;
-    //console.log(capture.toDataURL( "image/png" ));
-    snapshot.innerHTML = '';
+//     img.src		= capture.toDataURL( "image/png" );
+//     img.width	= 370;
+//     img.height	= 320;
+//     //console.log(capture.toDataURL( "image/png" ));
+//     snapshot.innerHTML = '';
 
-    snapshot.appendChild( img );
-    var d1 = capture.toDataURL("image/png");
-    var res = d1.replace("data:image/png;base64,", "");
-    // console.log(res);
-    snapshot.innerHTML = '';
-    snapshot.appendChild( img );
-    $("#img_hidden").val(res)    
+//     snapshot.appendChild( img );
+//     var d1 = capture.toDataURL("image/png");
+//     var res = d1.replace("data:image/png;base64,", "");
+//     // console.log(res);
+//     snapshot.innerHTML = '';
+//     snapshot.appendChild( img );
+//     $("#img_hidden").val(res)    
 
-  }
-}
-window.onload = function() {
-   startStreaming();
-   captureSnapshot();
-}
+//   }
+// }
+// window.onload = function() {
+//    startStreaming();
+//    captureSnapshot();
+// }
+
+var btnCapture = document.getElementById("btn-capture");
+    var stream = document.getElementById("stream");
+    var capture = document.getElementById("capture");
+    var snapshot = document.getElementById("snapshot");
+    var cameraStream = null;
+    
+    btnCapture.addEventListener( "click", captureSnapshot );
+
+    function startStreaming() {
+    
+      var mediaSupport = 'mediaDevices' in navigator;
+    
+      if( mediaSupport && null == cameraStream ) {
+    
+        navigator.mediaDevices.getUserMedia( { video: true } )
+        .then( function( mediaStream ) {
+          cameraStream = mediaStream;
+          stream.srcObject = mediaStream;
+          stream.play();
+        })
+        .catch( function( err ) {
+          console.log( "Unable to access camera: " + err );
+        });
+      }
+      else {
+        alert( 'Your browser does not support media devices.' );
+        return;
+      }
+    }
+    
+    function stopStreaming() {
+      if( null != cameraStream ) {
+        var track = cameraStream.getTracks()[ 0 ];
+        track.stop();
+        stream.load();
+        cameraStream = null;
+      }
+    }
+    
+    function captureSnapshot() {
+      if( null != cameraStream ) {
+        var ctx = capture.getContext( '2d' );
+        var img = new Image();
+        ctx.drawImage( stream, 0, 0, capture.width, capture.height );
+        img.src		= capture.toDataURL( "image/png" );
+        img.width	= 370;
+        img.height	= 320;
+        //console.log(capture.toDataURL( "image/png" ));
+        snapshot.innerHTML = '';
+        snapshot.appendChild( img );
+        var d1 = capture.toDataURL("image/png");
+        var res = d1.replace("data:image/png;base64,", "");
+        console.log(res);
+        snapshot.innerHTML = '';
+        snapshot.appendChild( img );
+        $("#image_hidden").val(res)    
+      }
+    }
+    window.onload = function() {
+       startStreaming();
+       captureSnapshot();
+    }
 
         </script>
 {% endblock %}
