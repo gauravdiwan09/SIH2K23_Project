@@ -106,6 +106,7 @@ def register(request):
     request.session['tempImage'] =imgdata
     sesOTP= generateOTP()
     request.session['tempOTP']= sesOTP
+    print("Data before session:- ",request.session['tempName'],request.session['tempOTP'])
     otp_email('MyProctor.ai - OTP Verification',"New Account opening - Your OTP Verfication code is "+sesOTP+".",email)
     return redirect("/verifyemailpage/")
 
@@ -123,7 +124,7 @@ def verify_email(request):
     dbPassword= request.session["tempPassword"]
     dbUser_type= request.session["tempUT"]
     dbImgdata= request.session["tempImage"]
-    print(dbImgdata)
+    print("Data after session:- ",request.session['tempName'],request.session['tempOTP'],mOTP)
     with connection.cursor() as cursor:
         if(theOTP == mOTP):
                 ar = cursor.execute('INSERT INTO drishtikon_users(name, email, password,register_time, user_type, user_image, user_login,examcredits) values(%s,%s,%s,%s,%s,%s,%s,%s)', (dbName, dbEmail, dbPassword,datetime.datetime.now(), dbUser_type, dbImgdata,0,7))
