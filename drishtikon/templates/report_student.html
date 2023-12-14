@@ -8,7 +8,7 @@
                     <div class="col-lg-12 col-sm-16">
 							<h3 class="h3 text-center">REPORT PROBLEMS</h3>  
                             </div>
-                            <img src="{{ url_for('static', filename='report_bug.png') }}">
+                            <img src="{% static 'report_bug.png' %}">
                             <div class="card-body">
 							    <form action="/report_student_email" method="POST" class="mt-4">
                                     <div class="form-group">
