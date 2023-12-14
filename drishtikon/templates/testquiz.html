@@ -126,7 +126,7 @@
 </div>
 </section>
 </main>
-  <script type="text/javascript" src="{{ url_for('static', filename='app.js') }}"></script>
+  <script type="text/javascript" src="{% static 'app.js' %}"></script>
   <script>
    var cal = "{{calc}}";
 console.log(cal)

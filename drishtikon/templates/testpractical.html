@@ -1,7 +1,7 @@
 {% extends 'exam_layout.html' %}
 {% block body %}
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="{{ url_for('static', filename='sdk.js') }}"></script>
+<script src="{% static 'sdk.js' %}"></script>
 <script>var tid = "{{test_id}}";</script>
 <main>
   <section class="d-flex align-items-center my-5 mt-lg-6 mb-lg-5">
@@ -95,7 +95,7 @@
  </div>
  </section>
  </main>
-  <script type="text/javascript" src="{{ url_for('static', filename='apppractical.js') }}"></script>
+  <script type="text/javascript" src="{%static 'apppractical.js' %}"></script>
   <script>
     var vid = "{{proctortypep}}";
 console.log(vid)
