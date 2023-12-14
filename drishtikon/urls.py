@@ -15,4 +15,6 @@ urlpatterns = [
     path("verifyemail/", views.verify_email, name="VerifyEmail"),
     path("studentindex/", views.student_index, name="StudentIndexPage"),
     path("professorindex/", views.professor_index, name="ProfessorIndexPage"),
+    path("createtestpage/", views.create_test_page, name="CreateTestPage"),
+    path("createtest/", views.create_test, name="CreateTest"),
     ]

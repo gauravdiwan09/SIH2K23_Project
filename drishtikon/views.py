@@ -13,6 +13,8 @@ import numpy as np
 import json
 import base64
 from django.views.decorators.csrf import csrf_exempt
+from coolname import generate_slug
+from werkzeug.utils import secure_filename
 
 # OTP Generator
 def generateOTP() : 
@@ -159,6 +161,51 @@ def send_query(request):
 	contact_us_email(message2,"hamzasanwala31@gmail.com")
 	messages.success(request,"Your query has been sent successfuly!!!")
 	return redirect('/contactpage/')
+
+# Create Test Page
+def create_test_page(request):
+    return render(request,'create_test.html')
+
+# Create Test
+def create_test(request):
+    start_date = request.POST.get("start_date")
+    end_date = request.POST.get("end_date")
+    start_time = request.POST.get("start_time")
+    end_time = request.POST.get("end_time")
+    start_date_time = str(start_date) + " " + str(start_time)
+    end_date_time = str(end_date) + " " + str(end_time)
+    duration = int(request.POST.get("duration"))
+    password = request.POST.get("password")
+    subject = request.POST.get("subject")
+    topic = request.POST.get("topic")
+    proctor_type = request.POST.get("proctor_type")
+    doc = request.FILES["doc"]
+    test_id = generate_slug(2)
+    # filename = secure_filename(doc)
+    # print(filename)
+    # filestream = doc
+    # print(start_date,end_date,start_time,end_time,start_date_time,end_date_time,duration,password,subject,topic,proctor_type,test_id,doc,filename)
+    # filestream.seek(0)
+    ef = pd.read_csv(doc)
+    fields = ['qid','q','a','b','c','d','ans','marks']
+    df = pd.DataFrame(ef, columns = fields)
+    print(df)
+    return HttpResponse("Test Created Successfully")
+    
+    with connection.cursor() as cur:
+        for row in df.index:
+            cur.execute('INSERT INTO questions(test_id,qid,q,a,b,c,d,ans,marks,uid) values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)', (test_id, df['qid'][row], df['q'][row], df['a'][row], df['b'][row], df['c'][row], df['d'][row], df['ans'][row], df['marks'][row], session['uid']))
+            cur.connection.commit()
+        
+        cur.execute('INSERT INTO teachers (email, test_id, test_type, start, end, duration, show_ans, password, subject, topic, neg_marks, calc,proctoring_type, uid) values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)',
+            (dict(session)['email'], test_id, "objective", start_date_time, end_date_time, duration, 1, password, subject, topic, neg_mark, calc, proctor_type, session['uid']))
+        mysql.connection.commit()
+        cur.execute('UPDATE users SET examcredits = examcredits-1 where email = %s and uid = %s', (session['email'],session['uid']))
+        mysql.connection.commit()
+        cur.close()
+        flash(f'Exam ID: {test_id}', 'success')
+        return redirect(url_for('professor_index'))
+    return HttpResponse("Test Created Successfully")
 
 # FAQ Page
 def faq(request):
