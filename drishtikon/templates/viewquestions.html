@@ -9,13 +9,14 @@
                     <div class="col-lg-12 col-sm-16">
                       <h3 class="h3 text-center">VIEW QUESTIONS</h3>  
                     </div>
-                    <form action="displayquestions" method="POST" class="mt-4">
+                    <form action="/displayquestionspage/" method="POST" class="mt-4">
+                        {% csrf_token %}
                         <div class="form-group">
                             <label class="my-1 mr-2" for="livebox">Choose Exam ID:</label>
                             <div class="input-group mb-4">
                                 <select class="custom-select my-1 mr-sm-2"  name="choosetid" required>
                                 {% for test in cresults %}
-                                <option value={{test['test_id']}}>{{test['test_id']}}</option>
+                                <option value={{test.0}}>{{test.0}}</option>
                                 {% endfor %}
                                 </select>
                                 </div>

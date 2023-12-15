@@ -1,4 +1,5 @@
 from django.shortcuts import render,HttpResponse,redirect
+from django.http import JsonResponse
 from .mails import contact_us_email,otp_email
 from django.contrib import messages
 from django.contrib import sessions
@@ -306,7 +307,7 @@ def test(request,testid):
             global duration, marked_ans, subject, topic, proctortype
             if request.method == 'GET':
                 # data = {'duration': duration, 'marks': '', 'q': '', 'a': '', 'b':'','c':'','d':'','answers':marked_ans,'subject':subject,'topic':topic,'tid':testid,'proctortype':proctortype }
-                data = { 'marks': '', 'q': '', 'a': '', 'b':'','c':'','d':'','tid':testid }
+                data = { 'marks': '', 'q': '', 'a': '', 'b':'','c':'','d':'','tid':testid,'proctortype':0 }
                 return render (request,'testquiz.html' ,data)
                 try:
                     data = {'duration': duration, 'marks': '', 'q': '', 'a': '', 'b':'','c':'','d':'','answers':marked_ans,'subject':subject,'topic':topic,'tid':testid,'proctortype':proctortype }
@@ -450,6 +451,220 @@ def test(request,testid):
                 cur.close()
                 flash('Some Error was occured!', 'error')
                 return redirect(url_for('student_index'))
+
+# Generate Test Page
+def generate_test_page(request):
+    return render(request,'generatetest.html')
+
+# View Questions Page
+def view_questions_page(request):
+    with connection.cursor() as cur:
+        results = cur.execute('SELECT test_id from drishtikon_teachers where email = %s and uid = %s', (request.session['email'],request.session['uid']))
+        if results > 0:
+            cresults = cur.fetchall()
+            data={'cresults':cresults}
+            return render (request,"viewquestions.html", data)
+        else:
+            data={'cresults':None}
+            return render (request,"viewquestions.html",data)
+
+# Exam Type Check
+# def examtypecheck(tidoption):
+#     with connection.cursor() as cur:
+#         print(callresults)
+#         return callresults
+
+# Display Questions Page
+def display_questions_page(request):
+    with connection.cursor() as cur:
+        tidoption = request.POST.get('choosetid')
+        cur.execute('SELECT test_type from drishtikon_teachers where test_id = %s and email = %s and uid = %s', (tidoption, request.session['email'], request.session['uid']))
+        et = cur.fetchone()
+        if et[0] == "objective":
+            cur.execute('SELECT * from drishtikon_questions where test_id = %s and uid = %s', (tidoption, request.session['uid']))
+            callresults = cur.fetchall()
+            data={'callresults':callresults}
+            return render (request,"displayquestions.html", data)
+        elif et[0] == "subjective":
+            cur.execute('SELECT * from drishtikon_longqa where test_id = %s and uid = %s', (tidoption,request.session['uid']))
+            callresults = cur.fetchall()
+            data={'callresults':callresults}
+            return render (request,"displayquestions.html", data)
+        elif et[0] == "practical":
+            cur.execute('SELECT * from drishtikon_practicalqa where test_id = %s and uid = %s', (tidoption,request.session['uid']))
+            callresults = cur.fetchall()
+            data={'callresults':callresults}
+            return render (request,"displayquestions.html", data)
+
+# Update TID List
+def update_tid_list(request):
+    with connection.cursor() as cur:
+        results = cur.execute('SELECT * from drishtikon_teachers where email = %s and uid = %s', (request.session['email'],request.session['uid']))
+        if results > 0:
+            cresults = cur.fetchall()
+            now = datetime.now()
+            now = now.strftime("%Y-%m-%d %H:%M:%S")
+            now = datetime.strptime(now,"%Y-%m-%d %H:%M:%S")
+            testids = []
+            for a in cresults:
+                if datetime.strptime(str(a[4]),"%Y-%m-%d %H:%M:%S") > now:
+                    testids.append(a[2])
+            data={'cresults':testids}
+            return render (request,"updatetidlist.html", data)
+        else:
+            data={'cresults':None}
+            return render (request,"updatetidlist.html", data)
+    
+# Update Disp Ques
+def update_disp_ques(request):
+    with connection.cursor() as cur:
+        tidoption = request.POST.get('choosetid')
+        cur.execute('SELECT test_type from drishtikon_teachers where test_id = %s and email = %s and uid = %s', (tidoption, request.session['email'], request.session['uid']))
+        et = cur.fetchone()
+        if et[0] == "objective":
+            cur.execute('SELECT * from drishtikon_questions where test_id = %s and uid = %s', (tidoption,request.session['uid']))
+            callresults = cur.fetchall()
+            data={'callresults':callresults}
+            return render (request,"updatedispques.html", data)
+        elif et[0] == "subjective":
+            cur.execute('SELECT * from drishtikon_longqa where test_id = %s and uid = %s', (tidoption,request.session['uid']))
+            callresults = cur.fetchall()
+            data={'callresults':callresults}
+            return render (request,"updatedispquesLQA.html", data)
+        elif et[0] == "practical":
+            cur.execute('SELECT * from drishtikon_practicalqa where test_id = %s and uid = %s', (tidoption,request.session['uid']))
+            callresults = cur.fetchall()
+            data={'callresults':callresults}
+            return render (request,"updatedispquesPQA.html", data)
+        else:
+            messages.error(request,'Error Occured!')
+            return redirect ('/updatetidlist/')
+
+# Update Test Page
+def update_test_page(request,testid,qid):
+    with connection.cursor() as cur:
+        cur.execute('SELECT * FROM drishtikon_questions where test_id = %s and qid =%s and uid = %s', (testid,qid,request.session['uid']))
+        uresults = cur.fetchall()
+        data={'uresults':uresults}
+        return render (request,"updateQuestions.html", data)
+
+# Update Test 
+def update_test(request,testid,qid):
+    with connection.cursor() as cur:
+        ques = request.POST.get('ques')
+        ao = request.POST.get('ao')
+        bo = request.POST.get('bo')
+        co = request.POST.get('co')
+        do = request.POST.get('do')
+        anso = request.POST.get('anso')
+        markso = request.POST.get('mko')
+        cur.execute('UPDATE drishtikon_questions SET q = %s, a = %s, b = %s, c = %s, d = %s, ans = %s, marks = %s where test_id = %s and qid = %s and uid = %s', (ques,ao,bo,co,do,anso,markso,testid,qid,request.session['uid']))
+        messages.success(request,'Updated successfully.')
+        return redirect ('/updatetidlist/')
+
+# Del TID List
+def del_tid_list(request):
+    with connection.cursor() as cur:
+        results = cur.execute('SELECT * from drishtikon_teachers where email = %s and uid = %s', (request.session['email'], request.session['uid']))
+        if results > 0:
+            cresults = cur.fetchall()
+            now = datetime.now()
+            now = now.strftime("%Y-%m-%d %H:%M:%S")
+            now = datetime.strptime(now,"%Y-%m-%d %H:%M:%S")
+            testids = []
+            for a in cresults:
+                if datetime.strptime(str(a[4]),"%Y-%m-%d %H:%M:%S") > now:
+                    testids.append(a[2])
+            data={'cresults':testids}
+            return render (request,"deltidlist.html", data)
+        else:
+            return render (request,"deltidlist.html")
+
+# Del Disp Ques
+def del_disp_ques(request):
+    with connection.cursor() as cur:
+        tidoption = request.POST.get('choosetid')
+        cur.execute('SELECT test_type from drishtikon_teachers where test_id = %s and email = %s and uid = %s', (tidoption, request.session['email'], request.session['uid']))
+        et = cur.fetchone()
+        if et[0] == "objective":
+            cur.execute('SELECT * from drishtikon_questions where test_id = %s and uid = %s', (tidoption,request.session['uid']))
+            callresults = cur.fetchall()
+            data={"callresults":callresults,'tid':tidoption}
+            return render (request,"deldispques.html", data)
+        elif et[0] == "subjective":
+            cur.execute('SELECT * from drishtikon_longqa where test_id = %s and uid = %s', (tidoption,request.session['uid']))
+            callresults = cur.fetchall()
+            data={"callresults":callresults,'tid':tidoption}
+            return render (request,"deldispquesLQA.html", data)
+        elif et[0] == "practical":
+            cur.execute('SELECT * from drishtikon_practicalqa where test_id = %s and uid = %s', (tidoption,request.session['uid']))
+            callresults = cur.fetchall()
+            data={"callresults":callresults,'tid':tidoption}
+            return render (request,"deldispquesPQA.html", data)
+        else:
+            messages.error(request,"Some Error Occured!")
+            return redirect ('/deltidlist/')
+
+
+# Delete Questions
+@csrf_exempt
+def delete_questions(request,testid):
+    with connection.cursor() as cur:
+        cur.execute('SELECT test_type from drishtikon_teachers where test_id = %s and email = %s and uid = %s', (testid, request.session['email'], request.session['uid']))
+        et = cur.fetchone()
+        if et[0] == "objective":
+            msg = '' 
+            # testqdel = request.json['qids']
+            testqdel = json.loads(request.body)['qids']
+            # print(testqdel)
+            if testqdel:
+                if ',' in testqdel:
+                    testqdel = testqdel.split(',')
+                    for getid in testqdel:
+                        cur.execute('DELETE FROM drishtikon_questions WHERE test_id = %s and qid =%s and uid = %s', (testid,getid,request.session['uid']))
+                    resp = JsonResponse('<span style=\'color:green;\'>Questions deleted successfully</span>',safe=False)
+                    resp.status_code = 200
+                    return resp
+                else:
+                    cur.execute('DELETE FROM drishtikon_questions WHERE test_id = %s and qid =%s and uid = %s', (testid,testqdel,request.session['uid']))
+                    resp = JsonResponse('<span style=\'color:green;\'>Questions deleted successfully</span>',safe=False)
+                    resp.status_code = 200
+                    return resp
+        elif et[0] == "subjective":
+            msg = '' 
+            testqdel = request.json['qids']
+            if testqdel:
+                if ',' in testqdel:
+                    testqdel = testqdel.split(',')
+                    for getid in testqdel:
+                        cur.execute('DELETE FROM drishtikon_longqa WHERE test_id = %s and qid =%s and uid = %s', (testid,getid,request.session['uid']))
+                    resp = JsonResponse('<span style=\'color:green;\'>Questions deleted successfully</span>')
+                    resp.status_code = 200
+                    return resp
+                else:
+                    cur.execute('DELETE FROM drishtikon_longqa WHERE test_id = %s and qid =%s and uid = %s', (testid,testqdel,request.session['uid']))
+                    resp = JsonResponse('<span style=\'color:green;\'>Questions deleted successfully</span>')
+                    resp.status_code = 200
+                    return resp
+        elif et[0] == "practical":
+            msg = '' 
+            testqdel = request.json['qids']
+            if testqdel:
+                if ',' in testqdel:
+                    testqdel = testqdel.split(',')
+                    for getid in testqdel:
+                        cur.execute('DELETE FROM drishtikon_practicalqa WHERE test_id = %s and qid =%s and uid = %s', (testid,getid,request.session['uid']))
+                    resp = JsonResponse('<span style=\'color:green;\'>Questions deleted successfully</span>')
+                    resp.status_code = 200
+                    return resp
+            else:
+                cur.execute('DELETE FROM drishtikon_questions WHERE test_id = %s and qid =%s and uid = %s', (testid,testqdel,request.session['uid']))
+                resp = JsonResponse('<span style=\'color:green;\'>Questions deleted successfully</span>')
+                resp.status_code = 200
+                return resp
+        else:
+            messages.error(request,"Some Error Occured!")
+            return redirect ('/deltidlist/')
 
 # FAQ Page
 def faq(request):

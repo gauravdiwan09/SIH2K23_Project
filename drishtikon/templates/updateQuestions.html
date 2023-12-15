@@ -9,15 +9,16 @@
 							<h3 class="h3 text-center">UPDATE QUESTIONS</h3>  
                             </div>
                             <div class="card-body">
-							    <form action="" method="POST" class="mt-4">
+							    <form action="/updatetest/{{uresults.0.1}}/{{uresults.0.2}}/" method="POST" class="mt-4">
+                                    {% csrf_token %}
                                     {% for uresults in uresults %}
                                     <div class="form-group">
-                                        <label for="exampleInputIcon3">Question {{uresults['qid']}} of {{uresults['test_id']}}</label>
+                                        <label for="exampleInputIcon3">Question {{uresults.2}} of {{uresults.1}}</label>
                                         <div class="input-group mb-4">
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text">Question</span>
                                             </div>
-                                            <input name="ques" value="{{uresults['q']}}" class="form-control" placeholder="QUESTION:" type="text" >
+                                            <input name="ques" value="{{uresults.3}}" class="form-control" placeholder="QUESTION:" type="text" >
                                         </div>
                                     </div>
                                     <div class="form-group">
@@ -26,7 +27,7 @@
                                           <div class="input-group-prepend">
                                               <span class="input-group-text">A</span>
                                           </div>
-                                          <input name="ao" value="{{uresults['a']}}" type="text" class="form-control" placeholder="OPTION A:"/>
+                                          <input name="ao" value="{{uresults.4}}" type="text" class="form-control" placeholder="OPTION A:"/>
                                       </div>
                                   </div>
                                   <div class="form-group">
@@ -35,7 +36,7 @@
                                         <div class="input-group-prepend">
                                             <span class="input-group-text">B</span>
                                         </div>
-                                        <input name="bo" value="{{uresults['b']}}" type="text" class="form-control"  placeholder="OPTION B:"/>
+                                        <input name="bo" value="{{uresults.5}}" type="text" class="form-control"  placeholder="OPTION B:"/>
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -44,7 +45,7 @@
                                         <div class="input-group-text">
                                             <span class="input-group-prepend">C</span>
                                         </div>
-                                        <input name="co" value="{{uresults['c']}}" type="text" class="form-control"  placeholder="OPTION C:"/>
+                                        <input name="co" value="{{uresults.6}}" type="text" class="form-control"  placeholder="OPTION C:"/>
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -53,7 +54,7 @@
                                         <div class="input-group-prepend">
                                             <span class="input-group-text">D</span>
                                         </div>
-                                        <input name="do" value="{{uresults['d']}}" type="text" class="form-control" placeholder="OPTION D:"/>
+                                        <input name="do" value="{{uresults.7}}" type="text" class="form-control" placeholder="OPTION D:"/>
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -62,7 +63,7 @@
                                         <div class="input-group-prepend">
                                             <span class="input-group-text">Answer</span>
                                         </div>
-                                        <input name="anso" value="{{uresults['ans']}}" type="text" class="form-control" placeholder="ANSWER:"/>
+                                        <input name="anso" value="{{uresults.8}}" type="text" class="form-control" placeholder="ANSWER:"/>
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -71,7 +72,7 @@
                                         <div class="input-group-prepend">
                                             <span class="input-group-text">Marks</span>
                                         </div>
-                                        <input name="mko" value="{{uresults['marks']}}" type="number" class="form-control" placeholder="MARKS:"/>
+                                        <input name="mko" value="{{uresults.9}}" type="number" class="form-control" placeholder="MARKS:"/>
                                     </div>
                                 </div>         
   <input type="submit" class="btn btn-primary" value="UPDATE!">

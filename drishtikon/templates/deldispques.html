@@ -1,11 +1,12 @@
 {% extends 'professor_dashboard.html' %}
 {% block body %}
+
 <div class="row align-items-center d-flex  justify-content-center">
     <div class="col-12 mb-4">
         <div class="card border-light shadow-sm components-section align-items-center d-flex  justify-content-center">
             <div class="card-body align-items-center d-flex justify-content-center">     
                 <div class="row mb-4">
-                    {% if(callresults is not none) %}
+                    {% if callresults %}
                     <div class="col-lg-12 col-sm-16">
         <h3 class="h3 text-center">DELETE QUESTIONS</h3>  
       </div>
@@ -28,15 +29,15 @@
                  <tbody>
 {% for res in callresults %}
               <tr>
-                    <td><input type="checkbox" name="row-check" value="{{ res['qid'] }}"></td>
-                    <td>{{res['qid']}}</td>
-                    <td>{{res['q']}}</td>
-                    <td>{{res['a']}}</td>
-                    <td>{{res['b']}}</td>
-                    <td>{{res['c']}}</td>
-                    <td>{{res['d']}}</td>
-                    <td>{{res['ans']}}</td>
-                    <td>{{res['marks']}}</td>
+                    <td><input type="checkbox" name="row-check" value="{{ res.2 }}"></td>
+                    <td>{{res.2}}</td>
+                    <td>{{res.3}}</td>
+                    <td>{{res.4}}</td>
+                    <td>{{res.5}}</td>
+                    <td>{{res.6}}</td>
+                    <td>{{res.7}}</td>
+                    <td>{{res.8}}</td>
+                    <td>{{res.9}}</td>
                 </tr>
 {% endfor %}
                       </tbody>
@@ -92,7 +93,7 @@
 			$.ajax({
 				type: "POST",
 				contentType: 'application/json',
-				url: "/delete_questions/"+tiddel,
+				url: "/deletequestions/"+tiddel+"/",
 				data: JSON.stringify({'qids': ids}),
 				dataType: "json",
 				cache: false,
