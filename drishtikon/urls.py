@@ -26,9 +26,12 @@ urlpatterns = [
     path("deltidlist/", views.del_tid_list, name="DelTIDList"),
     path("updatedispques/", views.update_disp_ques, name="UpdateDispQues"),
     path("deldispques/", views.del_disp_ques, name="DelDispQues"),
+    path("sharedetailsemails/", views.share_details_emails, name="ShareDetailsEmails"),
     path("test/<str:testid>/", views.test, name="Test"),
     path("deletequestions/<str:testid>/", views.delete_questions, name="DeleteQuestions"),
     path("updatetestpage/<str:testid>/<str:qid>/", views.update_test_page, name="UpdateTestPage"),
     path("updatetest/<str:testid>/<str:qid>/", views.update_test, name="UpdateTest"),
+    path("<str:email>/disptests/", views.disp_tests, name="DisplayTests"),
+    path("<str:email>/<str:testid>/sharedetails/", views.share_details, name="ShareDetails"),
     # path("examtypecheck/<str:tidoption>/", views.examtypecheck, name="ExamTypeCheck"),
     ]

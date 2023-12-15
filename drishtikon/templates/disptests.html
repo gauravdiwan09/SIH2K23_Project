@@ -5,7 +5,7 @@
         <div class="card border-light shadow-sm components-section align-items-center d-flex  justify-content-center">
             <div class="card-body align-items-center d-flex justify-content-center">     
                 <div class="row mb-4">
-                    {% if tests is not none and tests %}
+                    {% if tests %}
                     <div class="col-lg-12 col-sm-16">
         <h3 class="h3 text-center">EXAM HISTORY</h3> 
                     </div> 
@@ -24,11 +24,11 @@
 							 <tbody>
             {% for test in tests %}
                             <tr>
-								<td>{{test['test_id']}}</td>
-                                <td>{{test['password']}}</td>
-								<td>{{test['subject']}}</td>
-								<td>{{test['topic']}}</td>
-                                <td><a class="btn btn-primary" href="/{{session.email}}/{{test['test_id']}}/share_details">Share</a></td>
+								<td>{{test.2}}</td>
+                                <td>{{test.8}}</td>
+								<td>{{test.9}}</td>
+								<td>{{test.10}}</td>
+                                <td><a class="btn btn-primary" href="/{{request.session.email}}/{{test.2}}/sharedetails/">Share</a></td>
                              </tr>
             {% endfor %}
                                   </tbody>

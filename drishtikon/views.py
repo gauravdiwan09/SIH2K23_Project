@@ -1,6 +1,6 @@
 from django.shortcuts import render,HttpResponse,redirect
 from django.http import JsonResponse
-from .mails import contact_us_email,otp_email
+from .mails import contact_us_email,otp_email,share_details_email
 from django.contrib import messages
 from django.contrib import sessions
 import math,random
@@ -665,6 +665,44 @@ def delete_questions(request,testid):
         else:
             messages.error(request,"Some Error Occured!")
             return redirect ('/deltidlist/')
+
+# Disp Tests
+def disp_tests(request,email):
+    with connection.cursor() as cur:
+        if email == request.session['email']:
+            results = cur.execute('select * from drishtikon_teachers where email = %s and uid = %s', (email,request.session['uid']))
+            results = cur.fetchall()
+            data={'tests':results}
+            return render (request,'disptests.html', data)
+        else:
+            messages.warning(request,'You are not authorized',)
+            return redirect ('/professorindex/')
+
+# Share Details
+def share_details(request,email,testid):
+    with connection.cursor() as cur:
+        cur.execute('SELECT * from drishtikon_teachers where test_id = %s and email = %s', (testid, email))
+        callresults = cur.fetchall()
+        data={'callresults':callresults}   
+        return render (request,"share_details.html", data)
+
+# Share Details Emails
+def share_details_emails(request):
+    tid = request.POST.get('tid')
+    subject = request.POST.get('subject')
+    topic = request.POST.get('topic')
+    duration = request.POST.get('duration')
+    start = request.POST.get('start')
+    end = request.POST.get('end')
+    password = request.POST.get('password')
+    emailssharelist = request.POST.get('emailssharelist')
+    emaillist=emailssharelist.split(',')
+    # msg1 = Message('EXAM DETAILS - MyProctor.ai', sender = sender, recipients = [emailssharelist])
+    # msg1.body = " ".join(["EXAM-ID:", tid, "SUBJECT:", subject, "TOPIC:", topic, "DURATION:", duration, "START", start, "END", end, "PASSWORD", password, "NEGATIVE MARKS in %:","CALCULATOR ALLOWED:" ]) 
+    # mail.send(msg1)
+    share_details_email('EXAM DETAILS - MyProctor.ai'," ".join(["EXAM-ID:", tid, "SUBJECT:", subject, "TOPIC:", topic, "DURATION:", duration, "START", start, "END", end, "PASSWORD", password ]),emaillist)
+    messages.success(request,'Emails sended sucessfully!')
+    return redirect ("/professorindex/")
 
 # FAQ Page
 def faq(request):

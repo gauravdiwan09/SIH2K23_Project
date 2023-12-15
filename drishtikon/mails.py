@@ -22,3 +22,13 @@ def otp_email(subject,message,email):
     except Exception as e:
         return False
     return True
+
+def share_details_email(subject,message,emaillist):
+    try:
+        email_from=settings.EMAIL_HOST_USER
+        recipient_list=emaillist
+        print(recipient_list)
+        send_mail(subject,message,email_from,recipient_list)
+    except Exception as e:
+        return False
+    return True
