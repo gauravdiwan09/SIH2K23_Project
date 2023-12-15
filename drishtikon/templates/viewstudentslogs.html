@@ -5,19 +5,20 @@
         <div class="card border-light shadow-sm components-section align-items-center d-flex  justify-content-center">
             <div class="card-body align-items-center d-flex justify-content-center">     
                 <div class="row mb-4">
-                    {% if cresults is not none %}
+                    {% if cresults %}
                     <div class="col-lg-12 col-sm-16">
                       <h3 class="h3 text-center">VIEW STUDENT LOGS</h3>  
                     </div>
 <center><lottie-player src="https://assets3.lottiefiles.com/packages/lf20_45rapv.json"  background="transparent"  speed="1"  style="width: 250px; height: 250px;"  loop  autoplay></lottie-player></center>
                     <div class="card-body">
-							    <form action="displaystudentsdetails" method="POST" class="mt-4">
+							    <form action="/displaystudentsdetails/" method="POST" class="mt-4">
+                                    {% csrf_token %}
                                     <div class="form-group text-center">
                                         <div class="form-group">
                                             <label class="my-1 mr-2" for="livebox">Choose Exam ID:</label>
                                             <select class="custom-select my-1 mr-sm-2" id="livebox" name="choosetid" required>
                                                 {% for test in cresults %}
-                                                <option value={{test['test_id']}}>{{test['test_id']}}</option>
+                                                <option value={{test.0}}>{{test.0}}</option>
                                                 {% endfor %}
                                             </select>
                                         </div>

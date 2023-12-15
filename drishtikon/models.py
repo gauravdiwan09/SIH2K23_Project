@@ -56,6 +56,20 @@ class students(models.Model):
     ans=models.TextField()
     uid=models.BigIntegerField()
     
+class proctoring_log(models.Model):
+    pid=models.BigAutoField(primary_key=True)
+    email=models.CharField(max_length=100)
+    name=models.CharField(max_length=100)
+    test_id=models.CharField(max_length=100)
+    voice_db=models.IntegerField(null=True,blank=True,default=0)
+    img_log=models.TextField()
+    user_movements_updown=models.SmallIntegerField()
+    user_movements_lr=models.SmallIntegerField()
+    user_movements_eyes=models.SmallIntegerField()
+    phone_detection=models.SmallIntegerField()
+    person_status=models.SmallIntegerField()
+    log_time=models.DateTimeField(auto_now_add=True)
+    uid=models.BigIntegerField()
     
     
     

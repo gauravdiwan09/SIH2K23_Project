@@ -704,6 +704,162 @@ def share_details_emails(request):
     messages.success(request,'Emails sended sucessfully!')
     return redirect ("/professorindex/")
 
+# Live Monitoring TID
+def live_monitoring_tid(request):
+    with connection.cursor() as cur:
+        results = cur.execute('SELECT * from drishtikon_teachers where email = %s and uid = %s and proctoring_type = 1', (request.session['email'], request.session['uid']))
+        if results > 0:
+            cresults = cur.fetchall()
+            now = datetime.now()
+            now = now.strftime("%Y-%m-%d %H:%M:%S")
+            now = datetime.strptime(now,"%Y-%m-%d %H:%M:%S")
+            testids = []
+            for a in cresults:
+                if datetime.strptime(str(a[4]),"%Y-%m-%d %H:%M:%S") <= now and datetime.strptime(str(a[5]),"%Y-%m-%d %H:%M:%S") >= now:
+                    testids.append(a[2])
+            data={'cresults':testids}
+            return render (request,"livemonitoringtid.html", data)
+        else:
+            return render (request,"livemonitoringtid.html")
+
+# Live Monitoring
+def live_monitoring(request):
+    testid = request.POST.get('choosetid')
+    data={'testid':testid}
+    return render (request,'live_monitoring.html',data)
+
+# View Students Logs
+def view_students_logs(request):
+    with connection.cursor() as cur:
+        results = cur.execute('SELECT test_id from drishtikon_teachers where email = %s and uid = %s and proctoring_type = 0', (request.session['email'], request.session['uid']))
+        if results > 0:
+            cresults = cur.fetchall()
+            data={'cresults':cresults}
+            return render (request,"viewstudentslogs.html", data)
+        else:
+            return render (request,"viewstudentslogs.html")
+
+# Display Students Details
+def display_students_details(request):
+    with connection.cursor() as cur:
+        tidoption = request.POST.get('choosetid')
+        cur.execute('SELECT DISTINCT email,test_id from drishtikon_proctoring_log where test_id = %s', [tidoption])
+        callresults = cur.fetchall()
+        data={'callresults':callresults}
+        return render (request,"displaystudentsdetails.html", data)
+
+# Insert Marks TID
+def insert_marks_tid(request):
+    with connection.cursor() as cur:
+        results = cur.execute('SELECT * from drishtikon_teachers where show_ans = 0 and email = %s and uid = %s and (test_type = %s or test_type = %s)', (request.session['email'], request.session['uid'],"subjective","practical"))
+        if results > 0:
+            cresults = cur.fetchall()
+            now = datetime.now()
+            now = now.strftime("%Y-%m-%d %H:%M:%S")
+            now = datetime.strptime(now,"%Y-%m-%d %H:%M:%S")
+            testids = []
+            for a in cresults:
+                if datetime.strptime(str(a[5]),"%Y-%m-%d %H:%M:%S") < now:
+                    testids.append(a[2])
+            data={'cresults':testids}
+            return render (request,"insertmarkstid.html", data)
+        else:
+            return render (request,"insertmarkstid.html")
+
+# Publish Results Testid
+def publish_results_testid(request):
+    with connection.cursor() as cur:
+        results = cur.execute('SELECT * from drishtikon_teachers where test_type != %s AND show_ans = 0 AND email = %s AND uid = %s', ("objectve", request.session['email'], request.session['uid']))
+        if results > 0:
+            cresults = cur.fetchall()
+            now = datetime.now()
+            now = now.strftime("%Y-%m-%d %H:%M:%S")
+            now = datetime.strptime(now,"%Y-%m-%d %H:%M:%S")
+            testids = []
+            for a in cresults:
+                if datetime.strptime(str(a[5]),"%Y-%m-%d %H:%M:%S") < now:
+                    testids.append(a[2])
+            data={'cresults':testids}
+            return render (request,"publish_results_testid.html", data)
+        else:
+            return render (request,"publish_results_testid.html")
+
+# Tests Created
+def tests_created(request,email):
+    with connection.cursor() as cur:
+        if email == request.session['email']:
+            results = cur.execute('select * from drishtikon_teachers where email = %s and uid = %s and show_ans = 1', (email,request.session['uid']))
+            results = cur.fetchall()
+            data={'tests':results}
+            return render (request,'tests_created.html', data)
+        else:
+            messages.warning(request,'You are not authorized')
+            return redirect ('/professorindex/')
+
+# Marks Calculate
+def marks_calc(email,testid):
+    with connection.cursor() as cur:
+        results = cur.execute("select marks,q.qid as qid, \
+                q.ans as correct, ifnull(s.ans,0) as marked from drishtikon_questions q inner join \
+                drishtikon_students s on  s.test_id = q.test_id and s.test_id = %s \
+                and s.email = %s and s.qid = q.qid group by q.qid \
+                order by q.qid asc", (testid, email))
+        data=cur.fetchall()
+        sum=0.0
+        for i in range(results):
+            if(str(data[i][3]).upper() != '0'):
+                # if(str(data[i]['marked']).upper() != str(data[i]['correct']).upper()):
+                #     sum=sum - (negm/100) * int(data[i]['marks'])
+                if(str(data[i][3]).upper() == str(data[i][2]).upper()):
+                    sum+=int(data[i][0])
+        return sum
+
+# Student Results
+def student_results(request,email,testid):
+    with connection.cursor() as cur:
+        if email == request.session['email']:
+            cur.execute('SELECT test_type from drishtikon_teachers where test_id = %s and email = %s and uid = %s', (testid, request.session['email'], request.session['uid']))
+            et = cur.fetchone()
+            if et[0] == "objective":
+                results = cur.execute('select drishtikon_users.name as name,drishtikon_users.email as email, drishtikon_studenttestinfo.test_id as test_id from drishtikon_studenttestinfo, drishtikon_users where test_id = %s and completed = 1 and  drishtikon_users.user_type = %s and drishtikon_studenttestinfo.email=drishtikon_users.email ', (testid,'student'))
+                results = cur.fetchall()
+                final = []
+                names = []
+                scores = []
+                count = 1
+                for user in results:
+                    score = marks_calc(user[1], user[2])
+                    # user['srno'] = count
+                    # user['marks'] = score
+                    final.append([count, user[0], score])
+                    names.append(user[0])
+                    scores.append(score)
+                    count+=1
+                dic={'data':final,'labels':names,'values':scores}
+                return render (request,'student_results.html', dic)
+            elif et['test_type'] == "subjective":
+                cur = mysql.connection.cursor()
+                results = cur.execute('select users.name as name,users.email as email, longtest.test_id as test_id, SUM(longtest.marks) AS marks from longtest, users where longtest.test_id = %s  and  users.user_type = %s and longtest.email=users.email', (testid,'student'))
+                results = cur.fetchall()
+                cur.close()
+                names = []
+                scores = []
+                for user in results:
+                    names.append(user['name'])
+                    scores.append(user['marks'])
+                return render_template('student_results_lqa.html', data=results, labels=names, values=scores)
+            elif et['test_type'] == "practical":
+                cur = mysql.connection.cursor()
+                results = cur.execute('select users.name as name,users.email as email, practicaltest.test_id as test_id, SUM(practicaltest.marks) AS marks from practicaltest, users where practicaltest.test_id = %s  and  users.user_type = %s and practicaltest.email=users.email', (testid,'student'))
+                results = cur.fetchall()
+                cur.close()
+                names = []
+                scores = []
+                for user in results:
+                    names.append(user['name'])
+                    scores.append(user['marks'])
+                return render_template('student_results_pqa.html', data=results, labels=names, values=scores)
+
 # FAQ Page
 def faq(request):
     return render(request,"faq.html")

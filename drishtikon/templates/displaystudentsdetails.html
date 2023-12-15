@@ -86,12 +86,12 @@ $( document ).ready(function() {
 </script>
 <div class="container">
   <div class="card card-folders">
-    {% if callresults is not none %}
+    {% if callresults %}
     <div class="card-header">
       <div class="row align-items-center">
           <div class="col mr-auto">
             {% for res in callresults %}
-            <h4 class="card-title m-0">Student Folders of {{res['test_id']}}</h4>
+            <h4 class="card-title m-0">Student Folders of {{res.1}}</h4>
             {% endfor %}
           </div>
           <div class="col col-auto pr-2">
@@ -108,11 +108,11 @@ $( document ).ready(function() {
         <div class="d-inline-flex">
             <button class="folder-container">
                 <span>
-                <a href="studentmonitoringstats/{{res['test_id']}}/{{res['email']}}">
+                <a href="studentmonitoringstats/{{res.1}}/{{res.0}}">
               <div class="folder-icon">
                 <i class="fa fa-folder folder-icon-color"></i>
               </div>
-              <div class="folder-name">{{res['email']}}<br>
+              <div class="folder-name">{{res.0}}<br>
               </div>
             </a>
         </span>
