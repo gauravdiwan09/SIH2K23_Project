@@ -305,7 +305,8 @@ def test(request,testid):
         if callresults[0] == "objective":
             global duration, marked_ans, subject, topic, proctortype
             if request.method == 'GET':
-                data = {'duration': duration, 'marks': '', 'q': '', 'a': '', 'b':'','c':'','d':'','answers':marked_ans,'subject':subject,'topic':topic,'tid':testid,'proctortype':proctortype }
+                # data = {'duration': duration, 'marks': '', 'q': '', 'a': '', 'b':'','c':'','d':'','answers':marked_ans,'subject':subject,'topic':topic,'tid':testid,'proctortype':proctortype }
+                data = { 'marks': '', 'q': '', 'a': '', 'b':'','c':'','d':'','tid':testid }
                 return render (request,'testquiz.html' ,data)
                 try:
                     data = {'duration': duration, 'marks': '', 'q': '', 'a': '', 'b':'','c':'','d':'','answers':marked_ans,'subject':subject,'topic':topic,'tid':testid,'proctortype':proctortype }
