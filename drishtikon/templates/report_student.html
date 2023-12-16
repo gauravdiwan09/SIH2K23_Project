@@ -11,7 +11,8 @@
                             </div>
                             <img src="{% static 'report_bug.png' %}">
                             <div class="card-body">
-							    <form action="/report_student_email" method="POST" class="mt-4">
+							    <form action="/reportstudentemail/" method="POST" class="mt-4">
+                                    {% csrf_token %}
                                     <div class="form-group">
                                         <label class="my-1 mr-2" for="inlineFormCustomSelectPref">Choose Problem Category</label>
                                         <select class="custom-select my-1 mr-sm-2" id="inlineFormCustomSelectPref" name="prob_type" required>

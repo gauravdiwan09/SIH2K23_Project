@@ -25,6 +25,24 @@ def generateOTP() :
         OTP += digits[math.floor(random.random() * 10)] 
     return OTP 
 
+# Marks Calculate
+def marks_calc(email,testid):
+    with connection.cursor() as cur:
+        results = cur.execute("select marks,q.qid as qid, \
+                q.ans as correct, ifnull(s.ans,0) as marked from drishtikon_questions q inner join \
+                drishtikon_students s on  s.test_id = q.test_id and s.test_id = %s \
+                and s.email = %s and s.qid = q.qid group by q.qid \
+                order by q.qid asc", (testid, email))
+        data=cur.fetchall()
+        sum=0.0
+        for i in range(results):
+            if(str(data[i][3]).upper() != '0'):
+                # if(str(data[i]['marked']).upper() != str(data[i]['correct']).upper()):
+                #     sum=sum - (negm/100) * int(data[i]['marks'])
+                if(str(data[i][3]).upper() == str(data[i][2]).upper()):
+                    sum+=int(data[i][0])
+        return sum
+
 # Landing Page
 def home(request):
     return render(request,"index.html")
@@ -33,6 +51,125 @@ def home(request):
 def login_page(request):
     return render(request,'login.html')
 
+# Lost Password Page
+def lost_password_page(request):
+    return render (request,'lostpassword.html')
+
+# Lost Password
+def lost_password(request):
+    with connection.cursor() as cur:
+        lpemail = request.POST.get('lpemail')
+        results = cur.execute('SELECT * from drishtikon_users where email = %s' , [lpemail])
+        if results > 0:
+            sesOTPfp = generateOTP()
+            request.session['tempOTPfp'] = sesOTPfp
+            request.session['seslpemail'] = lpemail
+            otp_email('MyProctor.ai - OTP Verification for Lost Password',"Your OTP Verfication code for reset password is "+sesOTPfp+".",lpemail)
+            # msg1 = Message('MyProctor.ai - OTP Verification for Lost Password', sender = sender, recipients = [lpemail])
+            # msg1.body = "Your OTP Verfication code for reset password is "+sesOTPfp+"."
+            # mail.send(msg1)
+            return redirect ('/verifyOTPpage/') 
+        else:
+            messages.error(request,"Account not found.")
+            return render (request,'lostpassword.html')
+
+# Lp New Pwd
+def lp_new_pwd(request):
+    with connection.cursor() as cur:
+        npwd = request.POST.get('npwd')
+        cpwd = request.POST.get('cpwd')
+        slpemail = request.session['seslpemail']
+        if(npwd == cpwd ):
+            cur.execute('UPDATE drishtikon_users set password = %s where email = %s', (npwd, slpemail))
+            request.session.clear()
+            messages.success(request,"Your password was successfully changed.")
+            return render (request,'login.html')
+        else:
+            messages.error(request,"Password doesn't matched.")
+            return render (request,'lpnewpwd.html')
+
+# Verify OTP
+def verify_otp(request):
+    fpOTP = request.POST.get('fpotp')
+    fpsOTP = request.session['tempOTPfp']
+    if(fpOTP == fpsOTP):
+        return render (request,'lpnewpwd.html')
+    messages.error(request,"Incorrect OTP")
+    return render (request,'verifyOTPfp.html')
+
+# Verify OTP Page
+def verify_otp_page(request):
+    return render (request,'verifyOTPfp.html')
+
+# Change Password Professor
+def change_password_professor(request):
+    return render (request,'changepassword_professor.html')
+
+# Change Password Student
+def change_password_student(request):
+    return render (request,'changepassword_student.html')
+
+# Change Password
+def change_password(request):
+    with connection.cursor() as cur:
+        oldPassword = request.POST.get('oldpassword')
+        newPassword = request.POST.get('newpassword')
+        results = cur.execute('SELECT * from drishtikon_users where email = %s and uid = %s', (request.session['email'], request.session['uid']))
+        if results > 0:
+            data = cur.fetchone()
+            password = data[3]
+            usertype = data[5]
+            if(password == oldPassword):
+                cur.execute("UPDATE drishtikon_users SET password = %s WHERE email = %s", (newPassword, request.session['email']))
+                messages.success(request,'Changed successfully.')
+                if usertype == "student":
+                    return render (request,"student_index.html")
+                else:
+                    return render (request,"professor_index.html")
+            else:
+                messages.error(request,"Wrong password")
+                if usertype == "student":
+                    return render (request,"student_index.html")
+                else:
+                    return render (request,"professor_index.html")
+        else:
+            return redirect ('/')
+
+# Report Professor
+def report_professor(request):
+    return render (request,'report_professor.html')
+
+# Report Student
+def report_student(request):
+    return render (request,'report_student.html')
+
+# Report Professor Email
+def report_professor_email(request):
+    careEmail = "hamzasanwala31@gmail.com"
+    cname = request.session['name']
+    cemail = request.session['email']
+    ptype = request.POST.get('prob_type')
+    cquery = request.POST.get('rquery')
+    # msg1 = Message('PROBLEM REPORTED', sender = sender, recipients = [careEmail])
+    # msg1.body = " ".join(["NAME:", cname, "PROBLEM TYPE:", ptype ,"EMAIL:", cemail, "", "QUERY:", cquery]) 
+    # mail.send(msg1)
+    otp_email('PROBLEM REPORTED'," ".join(["NAME:", cname, "PROBLEM TYPE:", ptype ,"EMAIL:", cemail, "", "QUERY:", cquery]),careEmail)
+    messages.success(request,'Your Problem has been recorded.')
+    return render (request,'report_professor.html')
+
+# Report Student Email
+def report_student_email(request):
+    careEmail = "hamzasanwala31@gmail.com"
+    cname = request.session['name']
+    cemail = request.session['email']
+    ptype = request.POST.get('prob_type')
+    cquery = request.POST.get('rquery')
+    # msg1 = Message('PROBLEM REPORTED', sender = sender, recipients = [careEmail])
+    # msg1.body = " ".join(["NAME:", cname, "PROBLEM TYPE:", ptype ,"EMAIL:", cemail, "", "QUERY:", cquery]) 
+    # mail.send(msg1)
+    otp_email('PROBLEM REPORTED'," ".join(["NAME:", cname, "PROBLEM TYPE:", ptype ,"EMAIL:", cemail, "", "QUERY:", cquery]),careEmail)
+    messages.success(request,'Your Problem has been recorded.')
+    return render (request,'report_student.html')
 
 # Login
 @csrf_exempt
@@ -93,6 +230,61 @@ def student_index(request):
 # Professor Index Page
 def professor_index(request):
     return render(request,"professor_index.html")
+
+# Student Test History
+def student_test_history(request,email):
+    with connection.cursor() as cur:
+        if email == request.session['email']:
+            results = cur.execute('SELECT a.test_id, b.subject, b.topic \
+                from drishtikon_studenttestinfo a, drishtikon_teachers b where a.test_id = b.test_id and a.email=%s  \
+                and a.completed=1', [email])
+            results = cur.fetchall()
+            data={'tests':results}
+            return render (request,'student_test_history.html', data)
+        else:
+            messages.warning(request,'You are not authorized')
+            return redirect ('/studentindex/')
+
+# Tests Given Page
+def tests_given_page(request,email):
+    with connection.cursor() as cur:
+        if email == request.session['email']:
+            resultsTestids = cur.execute('select drishtikon_studenttestinfo.test_id as test_id from drishtikon_studenttestinfo, drishtikon_teachers where drishtikon_studenttestinfo.email = %s and drishtikon_studenttestinfo.uid = %s and drishtikon_studenttestinfo.completed=1 and drishtikon_teachers.test_id = drishtikon_studenttestinfo.test_id and drishtikon_teachers.show_ans = 1 ', (request.session['email'], request.session['uid']))
+            resultsTestids = cur.fetchall()
+            data={'cresults':resultsTestids}
+            return render (request,'tests_given.html', data)
+        else:
+            messages.warning(request,'You are not authorized')
+            return redirect ('/studentindex/')
+
+# Tests Given
+def tests_given(request,email):
+    with connection.cursor() as cur:
+        tidoption = request.POST.get('choosetid')
+        cur.execute('SELECT test_type from drishtikon_teachers where test_id = %s',[tidoption])
+        callresults = cur.fetchone()
+        if callresults[0] == "objective":
+            results = cur.execute('select distinct(drishtikon_students.test_id) as test_id, drishtikon_students.email as email, subject,topic from drishtikon_students, drishtikon_studenttestinfo, drishtikon_teachers where drishtikon_students.email = %s and drishtikon_teachers.test_type = %s and drishtikon_students.test_id = %s and drishtikon_students.test_id=drishtikon_teachers.test_id and drishtikon_students.test_id=drishtikon_studenttestinfo.test_id and drishtikon_studenttestinfo.completed=1', (email, "objective", tidoption))
+            results = cur.fetchall()
+            results1 = []
+            studentResults = None
+            for a in results:
+                results1.append(marks_calc(a[1],a[0]))
+                studentResults = zip(results,results1)
+            data={'tests':studentResults}
+            return render (request,'obj_result_student.html', data)
+        elif callresults['test_type'] == "subjective":
+            cur = mysql.connection.cursor()
+            studentResults = cur.execute('select SUM(longtest.marks) as marks, longtest.test_id as test_id, teachers.subject as subject, teachers.topic as topic from longtest,teachers,studenttestinfo where longtest.email = %s and longtest.test_id = %s and longtest.test_id=teachers.test_id and studenttestinfo.test_id=teachers.test_id and longtest.email = studenttestinfo.email and studenttestinfo.completed = 1 and teachers.show_ans=1 group by longtest.test_id', (email, tidoption))
+            studentResults = cur.fetchall()
+            cur.close()
+            return render_template('sub_result_student.html', tests=studentResults)
+        elif callresults['test_type'] == "practical":
+            cur = mysql.connection.cursor()
+            studentResults = cur.execute('select SUM(practicaltest.marks) as marks, practicaltest.test_id as test_id, teachers.subject as subject, teachers.topic as topic from practicaltest,teachers,studenttestinfo where practicaltest.email = %s and practicaltest.test_id = %s and practicaltest.test_id=teachers.test_id and studenttestinfo.test_id=teachers.test_id and practicaltest.email = studenttestinfo.email and studenttestinfo.completed = 1 and teachers.show_ans=1 group by practicaltest.test_id', (email, tidoption))
+            studentResults = cur.fetchall()
+            cur.close()
+            return render_template('prac_result_student.html', tests=studentResults)
 
 # Register
 @csrf_exempt
@@ -190,7 +382,7 @@ def create_test(request):
     ef = pd.read_csv(doc)
     fields = ['qid','q','a','b','c','d','ans','marks']
     df = pd.DataFrame(ef, columns = fields)
-    print(df)
+    # print(df)
     # return HttpResponse("Test Created Successfully")
     
     with connection.cursor() as cur:
@@ -605,7 +797,6 @@ def del_disp_ques(request):
             messages.error(request,"Some Error Occured!")
             return redirect ('/deltidlist/')
 
-
 # Delete Questions
 @csrf_exempt
 def delete_questions(request,testid):
@@ -795,24 +986,6 @@ def tests_created(request,email):
         else:
             messages.warning(request,'You are not authorized')
             return redirect ('/professorindex/')
-
-# Marks Calculate
-def marks_calc(email,testid):
-    with connection.cursor() as cur:
-        results = cur.execute("select marks,q.qid as qid, \
-                q.ans as correct, ifnull(s.ans,0) as marked from drishtikon_questions q inner join \
-                drishtikon_students s on  s.test_id = q.test_id and s.test_id = %s \
-                and s.email = %s and s.qid = q.qid group by q.qid \
-                order by q.qid asc", (testid, email))
-        data=cur.fetchall()
-        sum=0.0
-        for i in range(results):
-            if(str(data[i][3]).upper() != '0'):
-                # if(str(data[i]['marked']).upper() != str(data[i]['correct']).upper()):
-                #     sum=sum - (negm/100) * int(data[i]['marks'])
-                if(str(data[i][3]).upper() == str(data[i][2]).upper()):
-                    sum+=int(data[i][0])
-        return sum
 
 # Student Results
 def student_results(request,email,testid):

@@ -84,7 +84,7 @@ swal.fire({
   if (result.isConfirmed) {
               $.ajax({
                     type: "POST",
-                    url: "/logout",
+                    url: "/logout/",
                     success: function(response){
                       if(response=="success")
                       {
@@ -132,9 +132,8 @@ function funStartExam()
 })
 }
 </script>
-
         <nav class="navbar navbar-dark navbar-theme-primary px-4 col-12 d-md-none">
-            <a class="navbar-brand me-lg-5" href="/professor_index">
+            <a class="navbar-brand me-lg-5" href="/professorindex/">
               <center><lottie-player src="https://assets1.lottiefiles.com/packages/lf20_wEt2nn.json"  background="transparent"  speed="1"  style="width: 75px; height: 50px;"  loop  autoplay></lottie-player></center>
             </a>
             <div class="d-flex align-items-center">
@@ -153,7 +152,7 @@ function funStartExam()
                     alt="Bonnie Green">
                 </div>
                 <div class="d-block">
-                  <h2 class="h6">{{session.name}}</h2>
+                  <h2 class="h6">{{request.session.name}}</h2>
                   <a href ="#" onclick="return funLogout()"class="btn btn-secondary text-dark btn-xs"><span
                       class="me-2"><span class="fas fa-sign-out-alt"></span></span>Logout</a>
                 </div>
@@ -173,27 +172,27 @@ function funStartExam()
           </li>
       
           <li class="nav-item ">
-            <a href="/{{request.session.email}}/student_test_history" class="nav-link">
+            <a href="/{{request.session.email}}/studenttesthistory/" class="nav-link">
               <span class="sidebar-icon"><span class="fas fa-history"></span></span>
               <span class="sidebar-text">Exam History</span>
             </a>
           </li>
 
           <li class="nav-item ">
-            <a href="/{{request.session.email}}/tests-given" class="nav-link">
+            <a href="/{{request.session.email}}/testsgivenpage/" class="nav-link">
               <span class="sidebar-icon"><span class="fas fa-poll"></span></span>
               <span class="sidebar-text">Results</span>
             </a>
           </li>
           <li role="separator" class="dropdown-divider mt-4 mb-3 border-black"></li>
           <li class="nav-item ">
-            <a href="/report_student" class="nav-link">
+            <a href="/reportstudent/" class="nav-link">
               <span class="sidebar-icon"><span class="fas fa-bug"></span></span>
               <span class="sidebar-text">Report Problems</span>
             </a>
           </li>
           <li class="nav-item">
-            <a href="/changepassword_student" class="nav-link d-flex align-items-center">
+            <a href="/changepasswordstudent/" class="nav-link d-flex align-items-center">
               <span class="sidebar-icon"><span class="fas fa-key"></span></span>
               <span class="sidebar-text">Change Password</span>
             </a>

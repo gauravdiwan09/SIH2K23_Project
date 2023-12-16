@@ -10,7 +10,8 @@
                                    <h1 class="mb-0 h3">Verify OTP for lost password</h1>
                                </div>
                                <img src="{% static 'otp_security.png' %}">
-                               <form action="" method="POST" class="mt-4">
+                               <form action="/verifyOTP/" method="POST" class="mt-4">
+                                {% csrf_token %}
                                     <div class="form-group">
                                         <label>OTP</label>
                                         <div class="input-group mb-4">

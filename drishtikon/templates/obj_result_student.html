@@ -21,9 +21,9 @@
 							 <tbody>
             {% for test, test1 in tests %}
                             <tr>
-								<td>{{test['test_id']}}</td>
-								<td>{{test['subject']}}</td> 
-								<td>{{test['topic']}}</td> 
+								<td>{{test.0}}</td>
+								<td>{{test.2}}</td> 
+								<td>{{test.3}}</td> 
                                 <td>{{ test1 }}</td>
                              </tr>
             {% endfor %}

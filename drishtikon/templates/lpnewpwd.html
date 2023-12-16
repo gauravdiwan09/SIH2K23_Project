@@ -9,7 +9,8 @@
                                 <h1 class="mb-0 h3">RESET PASSWORD</h1>  
                             </div>
                             <div class="card-body">
-							    <form action="" method="POST" class="mt-4">
+							    <form action="/lpnewpwd/" method="POST" class="mt-4">
+                                    {% csrf_token %}
                                     <div class="form-group">
                                         <label for="exampleInputIcon3">NEW PASSWORD</label>
                                         <div class="input-group mb-4">
