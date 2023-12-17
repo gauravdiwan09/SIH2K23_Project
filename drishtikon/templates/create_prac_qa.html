@@ -1,6 +1,5 @@
 {% extends 'professor_dashboard.html' %}
 {% block body %}
-{% from "includes/_formhelpers.html" import render_field %}
 <div class="row align-items-center d-flex  justify-content-center">
   <div class="col-12 mb-4">
       <div class="card border-light shadow-sm components-section align-items-center d-flex  justify-content-center">
@@ -9,54 +8,65 @@
                   <div class="col-lg-12 col-sm-16">
                     <h3 class="h3 text-center">CREATE EXAM [PRACTICAL]</h3>  
                   </div>
-                  <div class="card-body">
-                              <form method="POST" action="">
-                                {{ form.csrf_token }}
-                                <div class="mb-4">
-                                  <div class="form-group">
-      {{render_field(form.subject, class="form-control")}}
-    </div>
-    <div class="form-group">
-      {{render_field(form.topic, class="form-control")}}
-    </div>
-    <div class="form-group">
-      {{render_field(form.questionprac, class="form-control")}}
-    </div>
-    <div class="form-group">
-      {{render_field(form.marksprac, class="form-control")}}
-    </div>
-    <div class="row">
-      <div class="form-group col-6">
-        {{render_field(form.start_date, class="form-control")}}
-      </div>
-      <div class="form-group col-6">
-        {{render_field(form.start_time, class="form-control")}}
-      </div>
-    </div>
-    <div class="row">
-      <div class="form-group col-6">
-        {{render_field(form.end_date, class="form-control")}}
-      </div>
-      <div class="form-group col-6">
-        {{render_field(form.end_time, class="form-control")}}
-      </div>
-    </div>
-    <div class="form-group">
-      {{render_field(form.password, class="form-control")}}
-    </div>
-    <div class="form-group">
-      {{render_field(form.compiler, class="form-control")}}
-    </div>
-    <div class="form-group">
-      {{render_field(form.duration, class="form-control")}}
-    </div>
-    <div class="form-group">
-      {{render_field(form.proctor_type)}}
-    </div>
-    <p><input type="submit" class="btn btn-primary" value="Create Exam"></p>
-    </div>
-  </form>
+            
   </div>
+  <div class="card-body">
+    <form method="POST" action="/createtestpqa/" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="mb-4">
+        <div class="form-group">
+</div>
+<label for="subject">Subject</label>
+<input type="text" id="subject" name="subject">
+<label for="topic">Topic</label>
+<input type="text" id="topic" name="topic">
+<label for="questionprac">Question</label>
+<input type="text" id="questionprac" name="questionprac">
+<label for="marksprac">Marks</label>
+<input type="text" id="marksprac" name="marksprac">
+<label for="start_date">Start Date</label>
+<input type="date" id="start_date" name="start_date">
+<label for="start_time">Start Time</label>
+<input type="time" id="start_time" name="start_time">
+<label for="end_date">End Date</label>
+<input type="date" id="end_date" name="end_date">
+<label for="end_time">End Time</label>
+<input type="time" id="end_time" name="end_time">
+<label for="duration">Duration(in min)</label>
+<input type="number" id="duration" name="duration">
+<label for="compiler">Compiler/Interpreter:</label>
+
+<select name="compiler" id="compiler">
+  <option value="11">C</option>
+  <option value="27">C#</option>
+  <option value="1">C++</option>
+  <option value="114">Go</option>
+  <option value="10">Java</option>
+  <option value="47">Kotlin</option>
+  <option value="56">Node.js</option>
+  <option value="43">Objective-C</option>
+  <option value="29">PHP</option>
+  <option value="54">Perl-6</option>
+  <option value="116">Python 3x</option>
+  <option value="117">R</option>
+  <option value="17">Ruby</option>
+  <option value="93">Rust</option>
+  <option value="52">SQLite-Queries</option>
+  <option value="40">SQLite-Schema</option>
+  <option value="39">Scala</option>
+  <option value="85">Swift</option>
+  <option value="57">TypeScript</option>
+</select>
+<label for="password">Exam Password</label>
+<input type="password" id="password" name="password">
+<p>Proctoring Type</p>
+<label for="automatic">Automatic Monitoring</label>
+<input type="radio" id="automatic" name="proctor_type" value="0">
+<label for="live">Live Monitoring</label>
+<input type="radio" id="live" name="proctor_type" value="1">
+<p><input type="submit" class="btn btn-primary" value="Create Exam"></p>
+</form>
+</div>
 </div>
 </div>
 </div>

@@ -71,5 +71,24 @@ class proctoring_log(models.Model):
     log_time=models.DateTimeField(auto_now_add=True)
     uid=models.BigIntegerField()
     
+class practicalqa(models.Model):
+    pracqa_qid=models.BigAutoField(primary_key=True)
+    test_id=models.CharField(max_length=100)
+    qid=models.CharField(max_length=25)
+    q=models.TextField()
+    compiler=models.SmallIntegerField()
+    marks=models.IntegerField()
+    uid=models.BigIntegerField()
     
+class practicaltest(models.Model):
+    pid=models.BigAutoField(primary_key=True)
+    email=models.CharField(max_length=100)
+    test_id=models.CharField(max_length=100)
+    qid=models.CharField(max_length=25)
+    code=models.TextField(null=True,blank=True)
+    input=models.TextField(null=True,blank=True)
+    executed=models.CharField(max_length=125)
+    marks=models.IntegerField()
+    uid=models.BigIntegerField()
     
+        

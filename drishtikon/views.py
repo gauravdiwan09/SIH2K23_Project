@@ -500,7 +500,8 @@ def test(request,testid):
             if request.method == 'GET':
                 # data = {'duration': duration, 'marks': '', 'q': '', 'a': '', 'b':'','c':'','d':'','answers':marked_ans,'subject':subject,'topic':topic,'tid':testid,'proctortype':proctortype }
                 data = { 'marks': '', 'q': '', 'a': '', 'b':'','c':'','d':'','tid':testid,'proctortype':0 }
-                return render (request,'testquiz.html' ,data)
+                # return render (request,'testquiz.html' ,data)
+                return render (request,'capture.html' ,data)
                 try:
                     data = {'duration': duration, 'marks': '', 'q': '', 'a': '', 'b':'','c':'','d':'','answers':marked_ans,'subject':subject,'topic':topic,'tid':testid,'proctortype':proctortype }
                     return render (request,'testquiz.html' ,data)
@@ -536,7 +537,7 @@ def test(request,testid):
                     messages.info(request,"Exam submitted successfully")
                     return json.dumps({'sql':'fired'})
 
-        elif callresults['test_type'] == "subjective":
+        elif callresults[0] == "subjective":
             if request.method == 'GET':
                 cur = mysql.connection.cursor()
                 cur.execute('SELECT test_id, qid, q, marks from longqa where test_id = %s ORDER BY RAND()',[testid])
@@ -593,57 +594,60 @@ def test(request,testid):
                         flash('Some Error was occured!', 'error')
                         return redirect(url_for('student_index'))
 
-        elif callresults['test_type'] == "practical":
+        elif callresults[0] == "practical":
             if request.method == 'GET':
-                cur = mysql.connection.cursor()
-                cur.execute('SELECT test_id, qid, q, marks, compiler from practicalqa where test_id = %s ORDER BY RAND()',[testid])
+                cur.execute('SELECT test_id, qid, q, marks, compiler from drishtikon_practicalqa where test_id = %s ORDER BY RAND()',[testid])
                 callresults1 = cur.fetchall()
-                cur.execute('SELECT time_to_sec(time_left) as duration from studentTestInfo where completed = 0 and test_id = %s and email = %s and uid = %s', (testid, session['email'], session['uid']))
+                cur.execute('SELECT time_to_sec(time_left) as duration from drishtikon_studenttestinfo where completed = 0 and test_id = %s and email = %s and uid = %s', (testid, request.session['email'], request.session['uid']))
                 studentTestInfo = cur.fetchone()
                 if studentTestInfo != None:
-                    duration = studentTestInfo['duration']
-                    cur.execute('SELECT test_id, subject, topic, proctoring_type from teachers where test_id = %s',[testid])
+                    duration = studentTestInfo[0]
+                    cur.execute('SELECT test_id, subject, topic, proctoring_type from drishtikon_teachers where test_id = %s',[testid])
                     testDetails = cur.fetchone()
-                    subject = testDetails['subject']
-                    test_id = testDetails['test_id']
-                    topic = testDetails['topic']
-                    proctortypep = testDetails['proctoring_type']
-                    cur.close()
-                    return render_template("testpractical.html", callresults = callresults1, subject = subject, duration = duration, test_id = test_id, topic = topic, proctortypep = proctortypep )
+                    subject = testDetails[1]
+                    test_id = testDetails[0]
+                    topic = testDetails[2]
+                    proctortypep = testDetails[3]
+                    data={'callresults':callresults1,'subject':subject,'duration':duration,'test_id':test_id,'topic':topic,'proctortypep':proctortypep}
+                    return render (request,"testpractical.html")
                 else:
-                    cur = mysql.connection.cursor()
-                    cur.execute('SELECT test_id, duration, subject, topic from teachers where test_id = %s',[testid])
+                    cur.execute('SELECT test_id, duration, subject, topic from drishtikon_teachers where test_id = %s',[testid])
                     testDetails = cur.fetchone()
-                    subject = testDetails['subject']
-                    duration = testDetails['duration']
-                    test_id = testDetails['test_id']
-                    topic = testDetails['topic']
-                    cur.close()
-                    return render_template("testpractical.html", callresults = callresults1, subject = subject, duration = duration, test_id = test_id, topic = topic )
+                    subject = testDetails[2]
+                    duration = testDetails[1]
+                    test_id = testDetails[0]
+                    topic = testDetails[3]
+                    data={'callresults':callresults1,'subject':subject,'duration':duration,'test_id':test_id,'topic':topic}
+                    return render (request,"testpractical.html")
             elif request.method == 'POST':
-                test_id = request.form["test_id"]
-                codeByStudent = request.form["codeByStudent"]
-                inputByStudent = request.form["inputByStudent"]
-                executedByStudent = request.form["executedByStudent"]
-                cur = mysql.connection.cursor()
-                insertStudentData = cur.execute('INSERT INTO practicaltest(email,test_id,qid,code,input,executed,uid) values(%s,%s,%s,%s,%s,%s,%s)', (session['email'], testid, "1", codeByStudent, inputByStudent, executedByStudent, session['uid']))
-                mysql.connection.commit()
+                test_id = request.POST.get("test_id")
+                codeByStudent = request.POST.get("codeByStudent")
+                inputByStudent = request.POST.get("inputByStudent")
+                executedByStudent = request.POST.get("executedByStudent")
+                insertStudentData = cur.execute('INSERT INTO drishtikon_practicaltest(email,test_id,qid,code,input,executed,uid) values(%s,%s,%s,%s,%s,%s,%s)', (request.session['email'], testid, "1", codeByStudent, inputByStudent, executedByStudent, request.session['uid']))
                 if insertStudentData > 0:
-                    insertStudentTestInfoData = cur.execute('UPDATE studentTestInfo set completed = 1 where test_id = %s and email = %s and uid = %s', (test_id, session['email'], session['uid']))
-                    mysql.connection.commit()
-                    cur.close()
+                    insertStudentTestInfoData = cur.execute('UPDATE drishtikon_studenttestinfo set completed = 1 where test_id = %s and email = %s and uid = %s', (test_id, request.session['email'], request.session['uid']))
                     if insertStudentTestInfoData > 0:
-                        flash('Successfully Exam Submitted', 'success')
-                        return redirect(url_for('student_index'))
+                        messages.success(request,'Successfully Exam Submitted')
+                        return redirect ('/studentindex/')
                     else:
-                        cur.close()
-                        flash('Some Error was occured!', 'error')
-                        return redirect(url_for('student_index'))	
+                        messages.error(request,'Some Error was occured!')
+                        return redirect ('/studentindex/')	
             else:
-                cur.close()
-                flash('Some Error was occured!', 'error')
-                return redirect(url_for('student_index'))
+                messages.error(request,'Some Error was occured!')
+                return redirect ('/studentindex/')
 
+# Backened Image
+@csrf_exempt
+def backened_image(request):
+    # img=request.POST.get('image')
+    img=json.loads(request.body)['image']
+    if img:
+        print("Got Image")
+        return JsonResponse({'status':'success'})
+    else:
+        print("Not found")
+        return JsonResponse({'status':'error'})
 # Generate Test Page
 def generate_test_page(request):
     return render(request,'generatetest.html')
@@ -1032,6 +1036,34 @@ def student_results(request,email,testid):
                     names.append(user['name'])
                     scores.append(user['marks'])
                 return render_template('student_results_pqa.html', data=results, labels=names, values=scores)
+
+# Create Test Pqa Page
+def create_test_pqa_page(request):
+    return render (request,'create_prac_qa.html')
+
+# Create Test Pqa
+def create_test_pqa(request):
+    with connection.cursor() as cur:
+        test_id = generate_slug(2)
+        compiler = request.POST.get("compiler")
+        questionprac = request.POST.get("questionprac")
+        marksprac = int(request.POST.get("marksprac"))
+        cur.execute('INSERT INTO drishtikon_practicalqa(test_id,qid,q,compiler,marks,uid) values(%s,%s,%s,%s,%s,%s)', (test_id, 1, questionprac, compiler, marksprac, request.session['uid']))
+        start_date = request.POST.get("start_date")
+        end_date = request.POST.get("end_date")
+        start_time = request.POST.get("start_time")
+        end_time = request.POST.get("end_time")
+        start_date_time = str(start_date) + " " + str(start_time)
+        end_date_time = str(end_date) + " " + str(end_time)
+        duration = int(request.POST.get("duration"))
+        password = request.POST.get("password")
+        subject = request.POST.get("subject")
+        topic = request.POST.get("topic")
+        proctor_type = request.POST.get("proctor_type")
+        cur.execute('INSERT INTO drishtikon_teachers (email, test_id, test_type, start, end, duration, show_ans, password, subject, topic, proctoring_type, uid) values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)',
+            (request.session['email'], test_id, "practical", start_date_time, end_date_time, duration, 0, password, subject, topic, proctor_type, request.session['uid']))
+        messages.success(request,f'Exam ID: {test_id}')
+        return redirect ('/professorindex/')
 
 # FAQ Page
 def faq(request):

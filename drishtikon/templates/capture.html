@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    #video {
+      width: 20%;
+      max-width: 640px;
+    }
+  </style>
+  <title>Camera Capture</title>
+</head>
+<body>
+  <h1>Camera Capture</h1>
+  <video id="video" playsinline autoplay></video>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const video = document.getElementById('video');
+      let capturedImage = null;
+
+      navigator.mediaDevices.getUserMedia({ video: true })
+        .then((stream) => {
+          video.srcObject = stream;
+        })
+        .catch((error) => {
+          console.error('Error accessing camera:', error);
+        });
+
+      function captureImage() {
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        capturedImage = canvas.toDataURL('image/png');
+        console.log('Image captured:', capturedImage);
+        sendImageToBackend(capturedImage);
+      }
+
+      setInterval(() => {
+        captureImage();
+        // Perform further operations with capturedImage as needed
+      }, 30000);
+
+      function sendImageToBackend(imageData) {
+    fetch('/backenedimage/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        // Add any other headers as needed
+      },
+      body: JSON.stringify({ image: imageData }),
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Image sent to backend successfully:', data);
+        // You can perform further actions with the response if needed
+      })
+      .catch(error => {
+        console.error('Error sending image to backend:', error);
+      });
+  }
+
+  // const captureInterval = setInterval(() => {
+  //   captureImage();
+  //   // Perform further operations with capturedImage as needed
+  // }, 30000);
+    });
+  </script>
+</body>
+</html>
