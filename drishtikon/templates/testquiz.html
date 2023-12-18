@@ -47,30 +47,22 @@
                                   </div>
                                   </div>
                                 </div>
+                                <form action="/submittest/{{tid}}/" method="post">
+                                  {% csrf_token %}
                             <div class="form-group">
-                              <div class="mb-0 h4">
-                                <div id='queid'>Q.</div><div id="que">{{ q }}</div><div id='mark'> [MAX MARKS: {{ marks}}] </div>
-                                      </div>
-                              </div>
-                              <div class="form-group">
-                                <label class="h6" for="exampleFormControlTextarea1">Select your Answer</label>
-                                <table id="options"  class="table">
-        <tr>
-          <td id='a'>𝐀. {{ a }}</td>
-        </tr>
-        <tr>
-          <td id='b'>𝐁. {{ b }}</td>
-        </tr>
-        <tr>
-          <td id='c'>𝐂. {{ c }}</td>
-        </tr>
-        <tr>
-          <td id='d'>𝐃. {{ d }}</td>
-        </tr>
-      </table>
-    </div>
+                              {% for i in questions %}
+                                <p>Q{{ forloop.counter }} {{i.3}}</p>  <p>Max Marks: {{i.9}}</p>
+                                <input type="radio" id="a" name="{{i.2}}" value="a">
+                                <label for="a">{{i.4}}</label><br>
+                                <input type="radio" id="b" name="{{i.2}}" value="b">
+                                <label for="b">{{i.5}}</label><br>
+                                <input type="radio" id="c" name="{{i.2}}" value="c">
+                                <label for="c">{{i.6}}</label><br>
+                                <input type="radio" id="d" name="{{i.2}}" value="d">
+                                <label for="d">{{i.7}}</label><br>
+                              {% endfor %}
 
-    <div class="row">
+    <!-- <div class="row">
       <div class="form-group col-3">
         <div class="mb-0 h6">
           <input type="button" value="Prev" id="prev" class="btn btn-primary btn-rounded">
@@ -91,11 +83,11 @@
                       <button class="btn btn-primary btn-rounded" id="bookmark">Bookmark</button>
                     </div>
     </div>
-    </div>
+    </div> -->
 
   <div class="form-group">
-  <div class="btn btn-block btn-primary" id="finish">Finish Test</div>
-  </div>
+  <input type="submit" >
+</form>
 
   <!-- <div class="form-group">
     <div class="container" id ="calccheck" style="display: none;">
@@ -107,7 +99,7 @@
     <div class="container">
       <div class="justify-content-center align-items-center">
         <div id="otEmbedContainer"  id ="livecheck" style="width:320px; height:320px; display: none;">
-        <script src="https://tokbox.com/embed/embed/ot-embed.js?embedId=2020dbd9-0a89-472d-a60b-ca12ddfd48bc&room={{tid}}"></script>
+        <!-- <script src="https://tokbox.com/embed/embed/ot-embed.js?embedId=2020dbd9-0a89-472d-a60b-ca12ddfd48bc&room={{tid}}"></script> -->
       </div>
       </div>
     </div>
@@ -141,16 +133,19 @@ else
 }
 var vid = "{{proctortype}}";
 console.log(vid)
-if(vid == "0")
-{
-  document.getElementById('videocheck').style.display = "block"
-  startStreaming();
+document.getElementById('videocheck').style.display = "block"
+  // startStreaming();
   captureSnapshot();
-}
-else
-{
-  document.getElementById('livecheck').style.display = "block"
-}
+// if(vid == "0")
+// {
+//   document.getElementById('videocheck').style.display = "block"
+//   // startStreaming();
+//   captureSnapshot();
+// }
+// else
+// {
+//   document.getElementById('livecheck').style.display = "block"
+// }
     </script>  
   <footer id="sticky-footer" class="py-4">
     <div class="d-flex text-center justify-content-center align-items-center" role="contentinfo">

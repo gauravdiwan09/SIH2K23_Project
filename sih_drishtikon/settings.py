@@ -75,8 +75,8 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 # EMAIL_USE_SSL = True
-EMAIL_HOST_USER = 'contactghrchalo@gmail.com'
-EMAIL_HOST_PASSWORD = 'eaxt jpnd cvdo pokr'
+EMAIL_HOST_USER = 'dristhikon.ai@gmail.com'
+EMAIL_HOST_PASSWORD = 'dmsf ngca rmga pmlc'
 
 
 # Database

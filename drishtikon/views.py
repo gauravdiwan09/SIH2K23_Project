@@ -31,7 +31,7 @@ def marks_calc(email,testid):
         results = cur.execute("select marks,q.qid as qid, \
                 q.ans as correct, ifnull(s.ans,0) as marked from drishtikon_questions q inner join \
                 drishtikon_students s on  s.test_id = q.test_id and s.test_id = %s \
-                and s.email = %s and s.qid = q.qid group by q.qid \
+                and s.email = %s and s.qid = q.qid group by q.marks, q.qid, q.ans, s.ans\
                 order by q.qid asc", (testid, email))
         data=cur.fetchall()
         sum=0.0
@@ -491,6 +491,7 @@ def give_test(request):
                 return redirect ('/givetestpage/')
 
 # Test
+@csrf_exempt
 def test(request,testid):  
     with connection.cursor() as cur:
         cur.execute('SELECT test_type from drishtikon_teachers where test_id = %s ', [testid])
@@ -498,9 +499,17 @@ def test(request,testid):
         if callresults[0] == "objective":
             global duration, marked_ans, subject, topic, proctortype
             if request.method == 'GET':
+                cur.execute("select * from drishtikon_questions where test_id='{}'".format(testid,))
+                questions=cur.fetchall()
+                cur.execute("select duration,subject,topic,proctoring_type from drishtikon_teachers where test_id='{}'".format(testid,))
+                d=cur.fetchall()
+                duration=d[0][0]
+                subject=d[0][1]
+                topic=d[0][2]
+                proctortype=d[0][3]
                 # data = {'duration': duration, 'marks': '', 'q': '', 'a': '', 'b':'','c':'','d':'','answers':marked_ans,'subject':subject,'topic':topic,'tid':testid,'proctortype':proctortype }
-                data = { 'marks': '', 'q': '', 'a': '', 'b':'','c':'','d':'','tid':testid,'proctortype':0 }
-                # return render (request,'testquiz.html' ,data)
+                data = {'questions':questions,'tid':testid,'duration':duration,'subject':subject,'topic':topic,'proctortype':proctortype}
+                return render (request,'testquiz.html' ,data)
                 return render (request,'capture.html' ,data)
                 try:
                     data = {'duration': duration, 'marks': '', 'q': '', 'a': '', 'b':'','c':'','d':'','answers':marked_ans,'subject':subject,'topic':topic,'tid':testid,'proctortype':proctortype }
@@ -509,33 +518,40 @@ def test(request,testid):
                     # return HttpResponse("Test interrupted Successfully")
                     return redirect ('/givetestpage/')
             else:
-                flag = request.form['flag']
-                if flag == 'get':
-                    num = request.form['no']
-                    results = cur.execute('SELECT test_id,qid,q,a,b,c,d,ans,marks from drishtikon_questions where test_id = %s and qid =%s',(testid, num))
-                    if results > 0:
-                        data = cur.fetchone()
-                        del data['ans']
-                        return json.dumps(data)
-                elif flag=='mark':
-                    qid = request.form['qid']
-                    ans = request.form['ans']
-                    results = cur.execute('SELECT * from drishtikon_students where test_id =%s and qid = %s and email = %s', (testid, qid, request.session['email']))
-                    if results > 0:
-                        cur.execute('UPDATE drishtikon_students set ans = %s where test_id = %s and qid = %s and email = %s', (testid, qid, request.session['email']))
-                    else:
-                        cur.execute('INSERT INTO drishtikon_students(email,test_id,qid,ans,uid) values(%s,%s,%s,%s,%s)', (request.session['email'], testid, qid, ans, request.session['uid']))
-                elif flag=='time':
-                    time_left = request.form['time']
-                    try:
-                        cur.execute('UPDATE drishtikon_studenttestinfo set time_left=SEC_TO_TIME(%s) where test_id = %s and email = %s and uid = %s and completed=0', (time_left, testid, request.session['email'], request.session['uid']))
-                        return json.dumps({'time':'fired'})
-                    except:
-                        pass
-                else:
-                    cur.execute('UPDATE drishtikon_studenttestinfo set completed=1,time_left=sec_to_time(0) where test_id = %s and email = %s and uid = %s', (testid, request.session['email'],request.session['uid']))
-                    messages.info(request,"Exam submitted successfully")
-                    return json.dumps({'sql':'fired'})
+                # flag = request.form['flag']
+                # if flag == 'get':
+                #     num = request.form['no']
+                #     results = cur.execute('SELECT test_id,qid,q,a,b,c,d,ans,marks from drishtikon_questions where test_id = %s and qid =%s',(testid, num))
+                #     if results > 0:
+                #         data = cur.fetchone()
+                #         del data['ans']
+                #         return json.dumps(data)
+                # elif flag=='mark':
+                #     qid = request.form['qid']
+                #     ans = request.form['ans']
+                #     results = cur.execute('SELECT * from drishtikon_students where test_id =%s and qid = %s and email = %s', (testid, qid, request.session['email']))
+                #     if results > 0:
+                #         cur.execute('UPDATE drishtikon_students set ans = %s where test_id = %s and qid = %s and email = %s', (testid, qid, request.session['email']))
+                #     else:
+                #         cur.execute('INSERT INTO drishtikon_students(email,test_id,qid,ans,uid) values(%s,%s,%s,%s,%s)', (request.session['email'], testid, qid, ans, request.session['uid']))
+                # elif flag=='time':
+                #     time_left = request.form['time']
+                #     try:
+                #         cur.execute('UPDATE drishtikon_studenttestinfo set time_left=SEC_TO_TIME(%s) where test_id = %s and email = %s and uid = %s and completed=0', (time_left, testid, request.session['email'], request.session['uid']))
+                #         return json.dumps({'time':'fired'})
+                #     except:
+                #         pass
+                # else:
+                # cur.execute("select qid from drishtikon_questions where test_id='{}'".format(testid,))
+                # d=cur.fetchall()
+                # for i in d:
+                #     ans=request.POST.get(i[0])
+                #     cur.execute("insert into drishtikon_students(email,test_id,qid,ans,uid) values('{}','{}','{}','{}',{})".format(request.session['email'],testid,i[0],ans,request.session['uid']))
+                # # return HttpResponse("Form submitted successfully")
+                # cur.execute('UPDATE drishtikon_studenttestinfo set completed=1,time_left=sec_to_time(0) where test_id = %s and email = %s and uid = %s', (testid, request.session['email'],request.session['uid']))
+                # messages.info(request,"Exam submitted successfully")
+                return json.dumps({'sql':'fired'})
+                # return redirect('/studentindex/')
 
         elif callresults[0] == "subjective":
             if request.method == 'GET':
@@ -636,6 +652,20 @@ def test(request,testid):
             else:
                 messages.error(request,'Some Error was occured!')
                 return redirect ('/studentindex/')
+
+# Submit Test
+def submit_test(request,testid):
+    with connection.cursor() as cur:
+        cur.execute("select qid from drishtikon_questions where test_id='{}'".format(testid,))
+        d=cur.fetchall()
+        for i in d:
+            ans=request.POST.get(i[0])
+            cur.execute("insert into drishtikon_students(email,test_id,qid,ans,uid) values('{}','{}','{}','{}',{})".format(request.session['email'],testid,i[0],ans,request.session['uid']))
+        # return HttpResponse("Form submitted successfully")
+        cur.execute('UPDATE drishtikon_studenttestinfo set completed=1,time_left=sec_to_time(0) where test_id = %s and email = %s and uid = %s', (testid, request.session['email'],request.session['uid']))
+        messages.info(request,"Exam submitted successfully")
+        # return json.dumps({'sql':'fired'})
+        return redirect('/studentindex/')
 
 # Backened Image
 @csrf_exempt

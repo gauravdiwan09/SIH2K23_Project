@@ -49,6 +49,7 @@ urlpatterns = [
     path("insertmarkstid/", views.insert_marks_tid, name="InsertMarksTID"),
     path("publishresultstestid/", views.publish_results_testid, name="PublishResultsTestid"),
     path("test/<str:testid>/", views.test, name="Test"),
+    path("submittest/<str:testid>/", views.submit_test, name="SubmitTest"),
     path("deletequestions/<str:testid>/", views.delete_questions, name="DeleteQuestions"),
     path("updatetestpage/<str:testid>/<str:qid>/", views.update_test_page, name="UpdateTestPage"),
     path("updatetest/<str:testid>/<str:qid>/", views.update_test, name="UpdateTest"),

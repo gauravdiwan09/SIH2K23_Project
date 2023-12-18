@@ -12,8 +12,8 @@
                              <div class="text-center text-md-center mb-4 mt-md-0">
                                  <div class="card-body">
                                   <div class="row">
-                                    <div class="col"><span><h4 class="display-6">Name: {{session['name']}}</h4></span></div>
-                                    <div class="col"><span><h4 class="display-6">Email: {{session['email']}}</h4></span></div>
+                                    <div class="col"><span><h4 class="display-6">Name: {{request.session.name}}</h4></span></div>
+                                    <div class="col"><span><h4 class="display-6">Email: {{request.session.email}}</h4></span></div>
                                   </div>
                                   </div>
                              </div>
@@ -44,7 +44,7 @@
                               {% for test in callresults %}
                                  <div class="form-group">
                                      <div class="mb-0 h4">
-                                      Q. {{test['qid']}} {{test['q']}} [MAX MARKS: {{test['marks']}}]
+                                      Q. {{test.1}} {{test.2}} [MAX MARKS: {{test.3}}]
                                      </div>
                                  </div>
                                  <div class="form-group">
@@ -96,7 +96,7 @@
  </div>
  </section>
  </main>
-  <script type="text/javascript" src="{%static 'apppractical.js' %}"></script>
+  <script type="text/javascript" src="{% static 'apppractical.js' %}"></script>
   <script>
     var vid = "{{proctortypep}}";
 console.log(vid)

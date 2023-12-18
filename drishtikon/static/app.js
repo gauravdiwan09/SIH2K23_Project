@@ -88,7 +88,14 @@ window.onfocus = function(event) {
   }
   
   function captureSnapshot() {
-  
+    navigator.mediaDevices.getUserMedia({video: true})
+    .then((stream) => {
+        video.srcObject=stream;
+    })
+    .cache((error) => {
+        console.error('Error accessing camera:',error);
+    });
+
     if( null != cameraStream ) {
       var ctx = capture.getContext( '2d' );
       var img = new Image();
