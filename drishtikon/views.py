@@ -65,8 +65,8 @@ def lost_password(request):
             sesOTPfp = generateOTP()
             request.session['tempOTPfp'] = sesOTPfp
             request.session['seslpemail'] = lpemail
-            otp_email('MyProctor.ai - OTP Verification for Lost Password',"Your OTP Verfication code for reset password is "+sesOTPfp+".",lpemail)
-            # msg1 = Message('MyProctor.ai - OTP Verification for Lost Password', sender = sender, recipients = [lpemail])
+            otp_email('Drishtikon.Ai - OTP Verification for Lost Password',"Your OTP Verfication code for reset password is "+sesOTPfp+".",lpemail)
+            # msg1 = Message('Drishtikon.Ai - OTP Verification for Lost Password', sender = sender, recipients = [lpemail])
             # msg1.body = "Your OTP Verfication code for reset password is "+sesOTPfp+"."
             # mail.send(msg1)
             return redirect ('/verifyOTPpage/') 
@@ -303,7 +303,7 @@ def register(request):
     sesOTP= generateOTP()
     request.session['tempOTP']= sesOTP
     print("Data before session:- ",request.session['tempName'],request.session['tempOTP'])
-    otp_email('MyProctor.ai - OTP Verification',"New Account opening - Your OTP Verfication code is "+sesOTP+".",email)
+    otp_email('Drishtikon.Ai - OTP Verification',"New Account opening - Your OTP Verfication code is "+sesOTP+".",email)
     return redirect("/verifyemailpage/")
 
 # Verify Email Page
