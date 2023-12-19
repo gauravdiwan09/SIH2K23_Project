@@ -16,6 +16,7 @@ import base64
 from django.views.decorators.csrf import csrf_exempt
 from coolname import generate_slug
 from werkzeug.utils import secure_filename
+# from .camera import get_frame
 
 # OTP Generator
 def generateOTP() : 
@@ -672,8 +673,32 @@ def submit_test(request,testid):
 def backened_image(request):
     # img=request.POST.get('image')
     img=json.loads(request.body)['image']
+    # img= base64.b64encode(img)
     if img:
-        print("Got Image")
+        # testid = request.form['data[testid]']
+        # voice_db = request.form['data[voice_db]']
+        # proctorData = get_frame(img)
+        # jpg_as_text = proctorData['jpg_as_text']
+        # mob_status =proctorData['mob_status']
+        # print(mob_status)
+        # person_status = proctorData['person_status']
+        # print(person_status)
+        # user_move1 = proctorData['user_move1']
+        # print(user_move1)
+        # user_move2 = proctorData['user_move2']
+        # print(user_move2)
+        # eye_movements = proctorData['eye_movements']
+        # print(eye_movements)
+        # cur = mysql.connection.cursor()
+        # results = cur.execute('INSERT INTO proctoring_log (email, name, test_id, voice_db, img_log, user_movements_updown, user_movements_lr, user_movements_eyes, phone_detection, person_status, uid) values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)',
+        #     (Email_login, Name_login, testid, voice_db, jpg_as_text, user_move1, user_move2, eye_movements, mob_status, person_status,UID_login))
+        # mysql.connection.commit()
+        # cur.close()
+        # if(results > 0):
+        #     return "recorded image of video"
+        # else:
+        #     return "error in video"
+        print("Hey")
         return JsonResponse({'status':'success'})
     else:
         print("Not found")
@@ -684,21 +709,21 @@ def generate_test_page(request):
 
 # View Questions Page
 def view_questions_page(request):
-    with connection.cursor() as cur:
-        results = cur.execute('SELECT test_id from drishtikon_teachers where email = %s and uid = %s', (request.session['email'],request.session['uid']))
-        if results > 0:
-            cresults = cur.fetchall()
-            data={'cresults':cresults}
-            return render (request,"viewquestions.html", data)
-        else:
-            data={'cresults':None}
-            return render (request,"viewquestions.html",data)
+        with connection.cursor() as cur:
+            results = cur.execute('SELECT test_id from drishtikon_teachers where email = %s and uid = %s', (request.session['email'],request.session['uid']))
+            if results > 0:
+                cresults = cur.fetchall()
+                data={'cresults':cresults}
+                return render (request,"viewquestions.html", data)
+            else:
+                data={'cresults':None}
+                return render (request,"viewquestions.html",data)
 
-# Exam Type Check
-# def examtypecheck(tidoption):
-#     with connection.cursor() as cur:
-#         print(callresults)
-#         return callresults
+    # Exam Type Check
+    # def examtypecheck(tidoption):
+    #     with connection.cursor() as cur:
+    #         print(callresults)
+    #         return callresults
 
 # Display Questions Page
 def display_questions_page(request):
